@@ -67,9 +67,6 @@ export default function ContactPage() {
           <h2 id="social-heading" className="text-2xl font-bold text-white mb-4">
             Seguinos
           </h2>
-          <p className="text-white/40 text-base leading-relaxed mb-6">
-            Estamos en todas las plataformas. Pasá a saludar.
-          </p>
           <SocialLinks size="md" />
         </section>
       </div>
