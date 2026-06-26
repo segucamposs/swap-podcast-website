@@ -15,6 +15,11 @@
   --animate-fade-in-up: fade-in-up 0.7s ease-out both;
 }
 
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
 @keyframes fade-in-up {
   from {
     opacity: 0;
