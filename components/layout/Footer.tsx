@@ -17,6 +17,7 @@ const PLATFORMS = [
 
 const SITE_LINKS = [
   { href: "/episodes", label: "Episodios" },
+  { href: "/invitados", label: "Invitados" },
   { href: "/about", label: "Nosotros" },
   { href: "/contact", label: "Contacto" },
 ];
