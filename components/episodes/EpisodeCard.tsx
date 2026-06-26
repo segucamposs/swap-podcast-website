@@ -49,14 +49,9 @@ export default function EpisodeCard({ episode }: EpisodeCardProps) {
           </p>
 
           {/* Title */}
-          <h3 className="text-white font-semibold text-base leading-snug mb-3 line-clamp-3 group-hover:text-brand-orange transition-colors duration-200">
+          <h3 className="text-white font-semibold text-base leading-snug mb-5 line-clamp-3 flex-1 group-hover:text-brand-orange transition-colors duration-200">
             {episode.title}
           </h3>
-
-          {/* Description */}
-          <p className="text-white/40 text-sm leading-relaxed line-clamp-3 flex-1 mb-5">
-            {episode.description}
-          </p>
 
           {/* CTA */}
           <span className="text-sm font-medium text-brand-orange group-hover:text-white transition-colors duration-200 inline-flex items-center gap-1">

@@ -6,6 +6,55 @@ import { getAllEpisodes, getEpisodeBySlug } from "@/lib/episodes/feed";
 
 export const revalidate = 3600;
 
+// ─── Description parser ───────────────────────────────────────────────────────
+
+type ParsedDescription = {
+  hook: string;
+  bullets: string[];
+  bio: string;
+};
+
+function parseDescription(description: string, guestName: string): ParsedDescription {
+  if (!description) return { hook: "", bullets: [], bio: "" };
+
+  // Strip promo tail ("Escuchalo completo en YouTube...")
+  const clean = description.replace(/\nEscuchalo completo[\s\S]*$/i, "").trim();
+
+  // Split on "En este episodio hablamos de:"
+  const match = clean.match(/^([\s\S]*?)\nEn este episodio hablamos de:\s*([\s\S]*)$/i);
+  if (!match) return { hook: clean, bullets: [], bio: "" };
+
+  const hook = match[1].trim();
+  const bulletSection = match[2].trim();
+  let bullets: string[] = [];
+  let bio = "";
+
+  if (bulletSection.includes("•")) {
+    // Format B: bullets are already separated by •
+    const [rawBullets, ...rest] = bulletSection.split("\n");
+    bullets = rawBullets.split("•").map((s) => s.trim()).filter(Boolean);
+    bio = rest.join("\n").trim();
+  } else {
+    // Format A: bullets are concatenated — split before any uppercase+lowercase that
+    // follows a non-space character (handles letters, digits, punctuation like ")")
+    const parts = bulletSection
+      .split(/(?<=[^\s])(?=[A-ZÁÉÍÓÚÑÜ][a-záéíóúñü])/u)
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    const firstName = guestName.split(" ")[0];
+    const bioIndex = parts.findIndex((p) => p.startsWith(firstName));
+    if (bioIndex !== -1) {
+      bio = parts[bioIndex];
+      bullets = parts.filter((_, i) => i !== bioIndex);
+    } else {
+      bullets = parts;
+    }
+  }
+
+  return { hook, bullets, bio };
+}
+
 interface Props {
   params: Promise<{ slug: string }>;
 }
@@ -45,6 +94,7 @@ export default async function EpisodePage({ params }: Props) {
 
   const artwork = episode.artworkUrl ?? episode.thumbnailUrl;
   const duration = formatDuration(episode.durationMs);
+  const parsed = parseDescription(episode.description, episode.guest);
   const displayDate = new Date(episode.publishedAt).toLocaleDateString("es-AR", {
     year: "numeric",
     month: "long",
@@ -142,11 +192,45 @@ export default async function EpisodePage({ params }: Props) {
         </header>
 
         {/* Description */}
-        <section aria-label="Descripción del episodio" className="prose prose-invert max-w-none">
-          <h2 className="text-lg font-semibold text-white mb-4">Sobre este episodio</h2>
-          <div className="text-white/60 text-base leading-relaxed whitespace-pre-line">
-            {episode.description}
-          </div>
+        <section aria-label="Descripción del episodio" className="space-y-8">
+          <h2 className="text-lg font-semibold text-white">Sobre este episodio</h2>
+
+          {parsed.bullets.length === 0 ? (
+            <p className="text-white/60 text-base leading-relaxed whitespace-pre-line">
+              {parsed.hook}
+            </p>
+          ) : (
+            <>
+              {parsed.hook && (
+                <p className="text-white/75 text-base leading-relaxed">
+                  {parsed.hook}
+                </p>
+              )}
+
+              <div>
+                <p className="text-xs font-mono uppercase tracking-widest text-white/30 mb-5">
+                  En este episodio
+                </p>
+                <ul className="space-y-4">
+                  {parsed.bullets.map((bullet, i) => (
+                    <li key={i} className="flex gap-3">
+                      <span className="text-brand-orange font-mono text-sm mt-0.5 flex-shrink-0 select-none">—</span>
+                      <span className="text-white/65 text-base leading-relaxed">{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {parsed.bio && (
+                <div className="pt-6 border-t border-white/8">
+                  <p className="text-xs font-mono uppercase tracking-widest text-white/30 mb-3">
+                    Sobre {episode.guest.split(" ")[0]}
+                  </p>
+                  <p className="text-white/50 text-sm leading-relaxed">{parsed.bio}</p>
+                </div>
+              )}
+            </>
+          )}
         </section>
 
         {/* Nav to more episodes */}
