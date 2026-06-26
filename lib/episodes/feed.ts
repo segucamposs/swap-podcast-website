@@ -7,6 +7,7 @@
  */
 import type { Episode } from "./types";
 import { getEpisodes as getFallbackEpisodes } from "./data";
+import { getSupabaseClient } from "@/lib/supabase/client";
 
 const ITUNES_SHOW_ID = "1830727081";
 const ITUNES_API_URL =
@@ -74,11 +75,39 @@ function parseTitle(trackName: string): { topic: string; guest: string } {
   return { topic: trackName.trim(), guest: "" };
 }
 
+// ─── Supabase episode links ───────────────────────────────────────────────────
+
+type EpisodeLinks = Record<string, { spotifyUrl?: string; youtubeUrl?: string }>;
+
+async function getEpisodeLinks(): Promise<EpisodeLinks> {
+  const supabase = getSupabaseClient();
+  if (!supabase) return {};
+
+  const { data, error } = await supabase
+    .from("episode_links")
+    .select("slug, spotify_url, youtube_url");
+
+  if (error || !data) return {};
+
+  return Object.fromEntries(
+    data.map((row) => [
+      row.slug,
+      {
+        spotifyUrl: row.spotify_url ?? undefined,
+        youtubeUrl: row.youtube_url ?? undefined,
+      },
+    ])
+  );
+}
+
 // ─── Public API ──────────────────────────────────────────────────────────────
 
 export async function getAllEpisodes(): Promise<Episode[]> {
   try {
-    const res = await fetch(ITUNES_API_URL, { next: { revalidate: 3600 } });
+    const [res, links] = await Promise.all([
+      fetch(ITUNES_API_URL, { next: { revalidate: 3600 } }),
+      getEpisodeLinks(),
+    ]);
     if (!res.ok) throw new Error(`iTunes API returned ${res.status}`);
 
     const data = await res.json();
@@ -107,8 +136,10 @@ export async function getAllEpisodes(): Promise<Episode[]> {
           description,
           guest,
           guestBio: "",
-          youtubeUrl: null,
-          spotifyUrl: "https://open.spotify.com/show/1t25iC8KdPXDZ9BUr1KgxY",
+          youtubeUrl: links[slug]?.youtubeUrl ?? null,
+          spotifyUrl:
+            links[slug]?.spotifyUrl ??
+            "https://open.spotify.com/show/1t25iC8KdPXDZ9BUr1KgxY",
           appleUrl: ep.trackViewUrl ?? null,
           publishedAt: ep.releaseDate,
           thumbnailUrl: ep.artworkUrl600 ?? null,

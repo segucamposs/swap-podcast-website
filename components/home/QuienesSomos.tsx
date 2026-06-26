@@ -119,7 +119,7 @@ export default function QuienesSomos() {
 
           {/* Label */}
           <motion.p
-            className="text-white/35 text-xs font-mono uppercase tracking-widest mb-7"
+            className="text-white/60 text-xs font-mono uppercase tracking-widest mb-7"
             initial={{ opacity: 0 }}
             animate={inView ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.6, delay: 0.25 }}

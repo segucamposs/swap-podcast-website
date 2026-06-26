@@ -1,35 +1,131 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform, useSpring } from "motion/react";
-import Image from "next/image";
+import { useRef, useState } from "react";
+import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import HeroLogo from "./HeroLogo";
 
 const SPRING = { stiffness: 80, damping: 20, mass: 0.5 };
 
+const TEXT_TRANSITION = { duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] as const };
+
+function EpisodesBadgeButton({
+  episodeCount,
+}: {
+  episodeCount: number;
+}) {
+  const [hovered, setHovered] = useState(false);
+  const defaultLabel = `${episodeCount} episodios publicados`;
+  const hoverLabel = "ver todos los episodios →";
+  const sizerText = hoverLabel.length > defaultLabel.length ? hoverLabel : defaultLabel;
+
+  return (
+    <Link
+      href="/episodes"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="relative inline-flex items-center justify-center bg-brand-orange/10 border border-brand-orange/25 rounded-full px-6 py-3 overflow-hidden hover:border-brand-orange/50 transition-colors duration-300 cursor-pointer"
+      aria-label={hoverLabel}
+    >
+      <span className="invisible flex items-center gap-2 text-sm font-medium font-mono whitespace-nowrap" aria-hidden="true">
+        <span className="w-1.5 h-1.5 rounded-full" />
+        {sizerText}
+      </span>
+
+      <AnimatePresence mode="wait" initial={false}>
+        {!hovered ? (
+          <motion.span
+            key="default"
+            className="absolute inset-0 flex items-center justify-center gap-2 text-brand-orange text-sm font-medium font-mono whitespace-nowrap"
+            initial={{ opacity: 0, y: 10, filter: "blur(6px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: -10, filter: "blur(6px)" }}
+            transition={TEXT_TRANSITION}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-brand-orange animate-pulse" aria-hidden="true" />
+            {defaultLabel}
+          </motion.span>
+        ) : (
+          <motion.span
+            key="hover"
+            className="absolute inset-0 flex items-center justify-center gap-2 text-brand-orange text-sm font-medium font-mono whitespace-nowrap"
+            initial={{ opacity: 0, y: 10, filter: "blur(6px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: -10, filter: "blur(6px)" }}
+            transition={TEXT_TRANSITION}
+          >
+            {hoverLabel}
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </Link>
+  );
+}
+
+function QuienesSomosButton() {
+  const [hovered, setHovered] = useState(false);
+  const defaultLabel = "¿quiénes somos?";
+  const hoverLabel = "conocé nuestra historia →";
+  const sizerText = hoverLabel.length > defaultLabel.length ? hoverLabel : defaultLabel;
+
+  return (
+    <Link
+      href="/about"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="relative inline-flex items-center justify-center border border-white/20 rounded-full px-6 py-3 overflow-hidden hover:border-white/50 transition-colors duration-300 cursor-pointer"
+      aria-label={hoverLabel}
+    >
+      <span className="invisible text-sm font-medium whitespace-nowrap" aria-hidden="true">
+        {sizerText}
+      </span>
+
+      <AnimatePresence mode="wait" initial={false}>
+        {!hovered ? (
+          <motion.span
+            key="default"
+            className="absolute inset-0 flex items-center justify-center text-white/60 text-sm font-medium whitespace-nowrap"
+            initial={{ opacity: 0, y: 10, filter: "blur(6px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: -10, filter: "blur(6px)" }}
+            transition={TEXT_TRANSITION}
+          >
+            {defaultLabel}
+          </motion.span>
+        ) : (
+          <motion.span
+            key="hover"
+            className="absolute inset-0 flex items-center justify-center text-white text-sm font-medium whitespace-nowrap"
+            initial={{ opacity: 0, y: 10, filter: "blur(6px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: -10, filter: "blur(6px)" }}
+            transition={TEXT_TRANSITION}
+          >
+            {hoverLabel}
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </Link>
+  );
+}
+
 export default function HeroSection({ episodeCount }: { episodeCount: number }) {
   const sectionRef = useRef<HTMLElement>(null);
 
-  // Progress 0 (hero top at viewport top) → 1 (hero bottom at viewport top)
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
   });
 
-  // Smooth spring over raw scroll for jitter-free transforms
   const progress = useSpring(scrollYProgress, SPRING);
 
-  // ── Hero content parallaxes upward ──────────────────────────
   const contentY     = useTransform(progress, [0, 1], ["0%", "-18%"]);
   const contentScale = useTransform(progress, [0, 0.8], [1, 0.97]);
   const contentOpacity = useTransform(progress, [0, 0.55], [1, 0]);
 
-  // ── Background glow scales down and darkens ──────────────────
   const glowScale   = useTransform(progress, [0, 1], [1, 0.82]);
   const glowOpacity = useTransform(progress, [0, 0.7], [0.08, 0]);
 
-  // ── Dark vignette deepens as section exits ───────────────────
   const overlayOpacity = useTransform(progress, [0.2, 0.9], [0, 0.75]);
 
   return (
@@ -38,7 +134,6 @@ export default function HeroSection({ episodeCount }: { episodeCount: number }) 
       className="relative min-h-screen flex items-center justify-center bg-black px-4 py-24 overflow-hidden"
       aria-label="Hero"
     >
-      {/* Radial glow — shrinks and fades as hero exits */}
       <motion.div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"
@@ -50,54 +145,22 @@ export default function HeroSection({ episodeCount }: { episodeCount: number }) 
         }}
       />
 
-      {/* Progressive dark overlay */}
       <motion.div
         aria-hidden="true"
         className="absolute inset-0 bg-black pointer-events-none z-[1]"
         style={{ opacity: overlayOpacity }}
       />
 
-      {/* Content — parallaxes up + fades */}
       <motion.div
         className="relative z-[2] text-center w-full"
         style={{ y: contentY, scale: contentScale, opacity: contentOpacity }}
       >
         <HeroLogo />
 
-        <div className="max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-brand-orange/10 border border-brand-orange/25 rounded-full px-4 py-1.5 mb-10">
-            <span
-              className="w-1.5 h-1.5 rounded-full bg-brand-orange animate-pulse"
-              aria-hidden="true"
-            />
-            <span className="text-brand-orange text-xs font-medium font-mono">
-              {episodeCount} episodios publicados
-            </span>
-          </div>
-
+        <div className="max-w-3xl mx-auto mt-10">
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="https://open.spotify.com/show/1t25iC8KdPXDZ9BUr1KgxY"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 bg-brand-orange text-white font-semibold px-8 py-3.5 rounded-full hover:bg-brand-orange/85 transition-colors duration-200"
-            >
-              <Image
-                src="/icons/spotify.png"
-                alt=""
-                width={18}
-                height={18}
-                className="object-contain brightness-0 invert"
-              />
-              Escuchar en Spotify
-            </a>
-
-            <Link
-              href="/episodes"
-              className="inline-flex items-center justify-center border border-white/20 text-white font-medium px-8 py-3.5 rounded-full hover:border-brand-orange hover:text-brand-orange transition-colors duration-200"
-            >
-              Ver todos los episodios
-            </Link>
+            <EpisodesBadgeButton episodeCount={episodeCount} />
+            <QuienesSomosButton />
           </div>
         </div>
       </motion.div>

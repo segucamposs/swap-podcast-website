@@ -31,10 +31,10 @@ export default function PageTransition() {
         <motion.div
           key="page-transition"
           className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center gap-6 pointer-events-none"
-          initial={{ opacity: 0 }}
+          initial={{ opacity: 1 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2, ease: "easeInOut" }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
         >
           <AnimatePresence>
             {logo && (

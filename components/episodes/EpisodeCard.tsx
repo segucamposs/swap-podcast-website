@@ -15,56 +15,58 @@ export default function EpisodeCard({ episode }: EpisodeCardProps) {
   const artwork = episode.artworkUrl ?? episode.thumbnailUrl;
 
   return (
-    <article className="group bg-zinc-900 border border-white/8 rounded-2xl overflow-hidden hover:border-brand-orange/40 transition-colors duration-300 flex flex-col">
-      {/* Artwork */}
-      {artwork && (
-        <div className="relative aspect-video bg-zinc-800 overflow-hidden">
-          <Image
-            src={artwork}
-            alt={`${episode.guest} — SWAP Podcast`}
-            fill
-            sizes="(max-width: 768px) 100vw, 33vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-          />
-        </div>
-      )}
+    <Link
+      href={`/episodes/${episode.slug}`}
+      aria-label={`Ver episodio: ${episode.title}`}
+      className="group bg-zinc-900 border border-white/8 rounded-2xl overflow-hidden hover:border-brand-orange/40 transition-colors duration-300 flex flex-col"
+    >
+      <article>
+        {/* Artwork */}
+        {artwork && (
+          <div className="relative aspect-square bg-zinc-800 overflow-hidden">
+            <Image
+              src={artwork}
+              alt={`${episode.guest} — SWAP Podcast`}
+              fill
+              sizes="(max-width: 768px) 100vw, 33vw"
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          </div>
+        )}
 
-      {/* Body */}
-      <div className="p-6 flex flex-col flex-1">
-        {/* Meta */}
-        <div className="flex items-center gap-2 text-xs font-mono text-brand-gray mb-3">
-          <span>EP. {episode.episodeNumber}</span>
-          <span aria-hidden="true">·</span>
-          <time dateTime={episode.publishedAt}>{date}</time>
-        </div>
+        {/* Body */}
+        <div className="p-6 flex flex-col flex-1">
+          {/* Meta */}
+          <div className="flex items-center gap-2 text-xs font-mono text-brand-gray mb-3">
+            <span>EP. {episode.episodeNumber}</span>
+            <span aria-hidden="true">·</span>
+            <time dateTime={episode.publishedAt}>{date}</time>
+          </div>
 
-        {/* Guest */}
-        <p className="text-brand-orange text-xs font-medium uppercase tracking-wider mb-2">
-          {episode.guest}
-        </p>
+          {/* Guest */}
+          <p className="text-brand-orange text-xs font-medium uppercase tracking-wider mb-2">
+            {episode.guest}
+          </p>
 
-        {/* Title */}
-        <h3 className="text-white font-semibold text-base leading-snug mb-3 line-clamp-3 group-hover:text-brand-orange transition-colors duration-200">
-          {episode.title}
-        </h3>
+          {/* Title */}
+          <h3 className="text-white font-semibold text-base leading-snug mb-3 line-clamp-3 group-hover:text-brand-orange transition-colors duration-200">
+            {episode.title}
+          </h3>
 
-        {/* Description */}
-        <p className="text-white/40 text-sm leading-relaxed line-clamp-3 flex-1 mb-5">
-          {episode.description}
-        </p>
+          {/* Description */}
+          <p className="text-white/40 text-sm leading-relaxed line-clamp-3 flex-1 mb-5">
+            {episode.description}
+          </p>
 
-        {/* CTA */}
-        <Link
-          href={`/episodes/${episode.slug}`}
-          className="text-sm font-medium text-brand-orange hover:text-white transition-colors duration-200 inline-flex items-center gap-1"
-          aria-label={`Ver episodio: ${episode.title}`}
-        >
-          Ver episodio{" "}
-          <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-0.5">
-            →
+          {/* CTA */}
+          <span className="text-sm font-medium text-brand-orange group-hover:text-white transition-colors duration-200 inline-flex items-center gap-1">
+            Ver episodio{" "}
+            <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-0.5">
+              →
+            </span>
           </span>
-        </Link>
-      </div>
-    </article>
+        </div>
+      </article>
+    </Link>
   );
 }

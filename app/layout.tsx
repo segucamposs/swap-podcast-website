@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Poppins, Geist_Mono } from "next/font/google";
+import InitialOverlay from "@/components/providers/InitialOverlay";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -45,6 +46,7 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${poppins.variable} ${geistMono.variable} h-full`}
     >
       <body className="min-h-full flex flex-col bg-black text-white">
+        <InitialOverlay />
         {children}
       </body>
     </html>
