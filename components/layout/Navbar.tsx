@@ -22,14 +22,9 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-black/95 backdrop-blur-sm border-b border-white/5">
       <nav
-        className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20"
+        className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-end h-20"
         aria-label="Navegación principal"
       >
-        {/* Wordmark */}
-        <Link href="/" aria-label="SWAP Podcast — Inicio" className="shrink-0 font-bold text-white text-lg tracking-wider">
-          SWAP<span className="text-brand-orange">.</span>
-        </Link>
-
         {/* Desktop links */}
         <div className="hidden md:flex items-center gap-8" role="list">
           {NAV_LINKS.map((link) => (
