@@ -18,8 +18,15 @@ async function getLatestYouTubeVideoId(): Promise<string> {
       { next: { revalidate: 3600 } }
     );
     const xml = await res.text();
-    const match = xml.match(/<yt:videoId>([^<]+)<\/yt:videoId>/);
-    return match?.[1] ?? "";
+    // Split into entries and skip Shorts (their link contains /shorts/ not /watch?v=)
+    const entries = xml.split("<entry>");
+    for (const entry of entries) {
+      if (entry.includes('href="https://www.youtube.com/watch?v=')) {
+        const idMatch = entry.match(/<yt:videoId>([^<]+)<\/yt:videoId>/);
+        if (idMatch?.[1]) return idMatch[1];
+      }
+    }
+    return "";
   } catch {
     return "";
   }
