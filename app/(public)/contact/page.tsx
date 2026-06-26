@@ -46,7 +46,7 @@ export default function ContactPage() {
           <h2 id="guest-heading" className="text-2xl font-bold text-white mb-6">
             Escribinos!
           </h2>
-          <
+          <a
             href="mailto:podcastswap@gmail.com?subject=Quiero ser invitado en SWAP"
             className="inline-flex items-center gap-2 bg-brand-orange text-white font-semibold px-8 py-3.5 rounded-full hover:bg-brand-orange/85 transition-colors duration-200"
           >
