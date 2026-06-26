@@ -2,17 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 
 const PLATFORMS = [
-  {
-    label: "Spotify",
-    href: "https://open.spotify.com/show/1t25iC8KdPXDZ9BUr1KgxY",
-  },
-  {
-    label: "Apple Podcasts",
-    href: "https://podcasts.apple.com/ar/podcast/swap-podcast/id1830727081",
-  },
-  { label: "YouTube", href: "https://youtube.com/@SwapPodcast" },
-  { label: "Instagram", href: "https://instagram.com/swapodcast" },
-  { label: "TikTok", href: "https://tiktok.com/@swappodcast" },
+  { label: "Spotify",        href: "https://open.spotify.com/show/1t25iC8KdPXDZ9BUr1KgxY",           src: "/icons/spotify.png" },
+  { label: "Apple Podcasts", href: "https://podcasts.apple.com/ar/podcast/swap-podcast/id1830727081", src: "/icons/apple-podcasts.png" },
+  { label: "YouTube",        href: "https://youtube.com/@SwapPodcast",                                src: "/icons/youtube.png" },
+  { label: "Instagram",      href: "https://instagram.com/swapodcast",                                src: "/icons/instagram.png" },
+  { label: "TikTok",         href: "https://tiktok.com/@swappodcast",                                 src: "/icons/tiktok.png" },
 ];
 
 const SITE_LINKS = [
@@ -34,9 +28,9 @@ export default function Footer() {
             <Image
               src="/logo/swap-logo-transparent.png"
               alt="SWAP Podcast"
-              width={88}
-              height={36}
-              className="h-8 w-auto mb-4"
+              width={4923}
+              height={1357}
+              className="h-10 w-auto mb-4"
             />
             <p className="text-white/40 text-sm leading-relaxed max-w-xs">
               Conversaciones reales para pibes que construyen algo. En argentino,
@@ -55,15 +49,22 @@ export default function Footer() {
             <h3 className="text-white text-sm font-semibold uppercase tracking-wider mb-4">
               Escuchanos
             </h3>
-            <ul className="flex flex-col gap-2" role="list">
+            <ul className="flex flex-col gap-3" role="list">
               {PLATFORMS.map((p) => (
                 <li key={p.label}>
                   <a
                     href={p.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-white/40 text-sm hover:text-brand-orange transition-colors duration-200"
+                    className="group flex items-center gap-2.5 text-white/40 text-sm hover:text-white transition-colors duration-200"
                   >
+                    <Image
+                      src={p.src}
+                      alt=""
+                      width={16}
+                      height={16}
+                      className="w-4 h-4 object-contain grayscale opacity-60 transition-all duration-300 group-hover:grayscale-0 group-hover:opacity-100"
+                    />
                     {p.label}
                   </a>
                 </li>
