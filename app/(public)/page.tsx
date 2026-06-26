@@ -116,7 +116,7 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            <SpotifyPlayerCard episode={latestEpisode} />
+            <SpotifyPlayerCard />
           </div>
         </section>
       )}
