@@ -64,7 +64,7 @@ export default async function HomePage() {
 
         <div className="relative z-10 text-center w-full animate-fade-in-up">
           {/* Logo — wide, fills viewport */}
-          <div className="max-w-5xl mx-auto px-2 mb-8">
+          <div className="max-w-xl mx-auto px-2 mb-8">
             <Image
               src="/logo/swap-logo-transparent.png"
               alt="SWAP Podcast"
