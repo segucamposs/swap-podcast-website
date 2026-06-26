@@ -10,49 +10,6 @@ export const metadata: Metadata = {
 
 export const revalidate = 3600;
 
-const VALUES = [
-  {
-    title: "Autenticidad",
-    description:
-      "Nunca fingirnos lo que no somos. Si no entendemos algo, lo decimos.",
-  },
-  {
-    title: "Curiosidad",
-    description:
-      "Preguntamos desde el interés genuino — incluyendo las preguntas que otros evitan.",
-  },
-  {
-    title: "Inclusión",
-    description:
-      "Creamos un espacio donde todos se sienten parte, no solo oyentes.",
-  },
-  {
-    title: "Conversación",
-    description:
-      "No es una entrevista formal. Es una charla entre gente que tiene ganas de aprender.",
-  },
-  {
-    title: "Respeto",
-    description:
-      "Escuchamos con la cabeza abierta, aunque no estemos de acuerdo.",
-  },
-  {
-    title: "Claridad",
-    description:
-      "Si aparece un término complicado, lo explicamos. Simple siempre gana.",
-  },
-];
-
-const PILLARS = [
-  "Salud y deporte",
-  "Productividad",
-  "Desarrollo personal",
-  "Carrera y trabajo",
-  "Emprendimiento",
-  "Tecnología & IA",
-  "Mindset",
-];
-
 const HOSTS = [
   {
     name: "Segundo Campos",
@@ -180,47 +137,6 @@ export default async function AboutPage() {
                   </a>
                 )}
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Valores ───────────────────────────────────────────────── */}
-      <section className="bg-zinc-950 border-y border-white/5 py-20 px-4" aria-labelledby="values-heading">
-        <div className="max-w-4xl mx-auto">
-          <h2 id="values-heading" className="text-3xl font-bold text-white mb-12">
-            Cómo somos
-          </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {VALUES.map((v) => (
-              <div key={v.title} className="flex flex-col gap-2">
-                <div className="w-8 h-0.5 bg-brand-orange rounded-full" aria-hidden="true" />
-                <h3 className="text-white font-semibold text-base">{v.title}</h3>
-                <p className="text-white/40 text-sm leading-relaxed">{v.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Temas ─────────────────────────────────────────────────── */}
-      <section className="py-20 px-4" aria-labelledby="pillars-heading">
-        <div className="max-w-4xl mx-auto">
-          <h2 id="pillars-heading" className="text-3xl font-bold text-white mb-8">
-            De qué hablamos
-          </h2>
-          <p className="text-white/50 text-lg leading-relaxed mb-8 max-w-xl">
-            No nos encerramos en una sola temática. Si le aporta valor a un pibe
-            de 16 a 25 años, lo hablamos.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            {PILLARS.map((p) => (
-              <span
-                key={p}
-                className="px-4 py-2 bg-zinc-900 border border-white/8 rounded-full text-white/60 text-sm font-medium hover:border-brand-orange/40 hover:text-white/80 transition-colors duration-200"
-              >
-                {p}
-              </span>
             ))}
           </div>
         </div>
