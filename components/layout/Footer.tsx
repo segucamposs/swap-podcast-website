@@ -99,9 +99,8 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-10 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/20">
+        <div className="mt-10 pt-8 border-t border-white/5 text-xs text-white/20">
           <span>© {year} SWAP Podcast. Todos los derechos reservados.</span>
-          <span>Hecho con ☕ en Buenos Aires</span>
         </div>
       </div>
     </footer>
