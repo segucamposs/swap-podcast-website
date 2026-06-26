@@ -6,40 +6,53 @@ const DRAFT_KEY = "swap_newsletter_draft";
 
 type Status = "idle" | "loading" | "success" | "error";
 
+interface Draft {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+function loadDraft(): Draft {
+  if (typeof window === "undefined") return { firstName: "", lastName: "", email: "" };
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    return raw ? JSON.parse(raw) : { firstName: "", lastName: "", email: "" };
+  } catch {
+    return { firstName: "", lastName: "", email: "" };
+  }
+}
+
 export default function NewsletterForm() {
-  // Lazy initializer reads draft from localStorage once on mount (safe SSR check)
-  const [email, setEmail] = useState<string>(() => {
-    if (typeof window === "undefined") return "";
-    return localStorage.getItem(DRAFT_KEY) ?? "";
-  });
+  const [form, setForm] = useState<Draft>(() => loadDraft());
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Persist draft while typing
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setEmail(value);
-    if (value) {
-      localStorage.setItem(DRAFT_KEY, value);
-    } else {
-      localStorage.removeItem(DRAFT_KEY);
-    }
+    const updated = { ...form, [e.target.name]: e.target.value };
+    setForm(updated);
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(updated));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (status === "loading") return;
 
-    // Basic client-side validation
-    const trimmed = email.trim();
-    if (!trimmed) {
+    const { firstName, lastName, email } = form;
+
+    // Client-side validation
+    if (!firstName.trim()) {
       setStatus("error");
-      setErrorMessage("Ingresá tu email.");
+      setErrorMessage("Ingresá tu nombre.");
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+    if (!lastName.trim()) {
       setStatus("error");
-      setErrorMessage("Ese email no parece válido.");
+      setErrorMessage("Ingresá tu apellido.");
+      return;
+    }
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setStatus("error");
+      setErrorMessage("Ingresá un email válido.");
       return;
     }
 
@@ -50,14 +63,18 @@ export default function NewsletterForm() {
       const res = await fetch("/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: trimmed }),
+        body: JSON.stringify({
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          email: email.trim(),
+        }),
       });
 
       const data = await res.json().catch(() => ({}));
 
       if (res.status === 201) {
         setStatus("success");
-        setEmail("");
+        setForm({ firstName: "", lastName: "", email: "" });
         localStorage.removeItem(DRAFT_KEY);
       } else if (res.status === 409) {
         setStatus("error");
@@ -83,30 +100,66 @@ export default function NewsletterForm() {
             <path d="M20 6 9 17l-5-5" />
           </svg>
         </div>
-        <p className="text-white font-semibold">¡Listo! Te avisamos cuando sale un nuevo episodio.</p>
+        <p className="text-white font-semibold">
+          ¡Listo, {form.firstName || "ya sos parte de SWAP"}! Te avisamos cuando sale un nuevo episodio.
+        </p>
         <p className="text-white/40 text-sm">Ya sos parte de SWAP.</p>
       </div>
     );
   }
 
+  const inputClass =
+    "w-full bg-white/5 border border-white/10 focus:border-brand-orange/60 focus:bg-white/8 rounded-xl px-4 py-3 text-white placeholder:text-white/25 text-sm outline-none transition-colors duration-200 disabled:opacity-50";
+
   return (
-    <form onSubmit={handleSubmit} noValidate className="w-full">
+    <form onSubmit={handleSubmit} noValidate className="w-full flex flex-col gap-3">
+      {/* Name row */}
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label htmlFor="newsletter-firstName" className="sr-only">Nombre</label>
+          <input
+            id="newsletter-firstName"
+            type="text"
+            name="firstName"
+            value={form.firstName}
+            onChange={handleChange}
+            placeholder="Nombre"
+            autoComplete="given-name"
+            disabled={status === "loading"}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label htmlFor="newsletter-lastName" className="sr-only">Apellido</label>
+          <input
+            id="newsletter-lastName"
+            type="text"
+            name="lastName"
+            value={form.lastName}
+            onChange={handleChange}
+            placeholder="Apellido"
+            autoComplete="family-name"
+            disabled={status === "loading"}
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      {/* Email + submit row */}
       <div className="flex flex-col sm:flex-row gap-3">
-        <label htmlFor="newsletter-email" className="sr-only">
-          Tu email
-        </label>
+        <label htmlFor="newsletter-email" className="sr-only">Email</label>
         <input
           id="newsletter-email"
           type="email"
           name="email"
-          value={email}
+          value={form.email}
           onChange={handleChange}
           placeholder="tu@email.com"
           autoComplete="email"
           disabled={status === "loading"}
           aria-describedby={status === "error" ? "newsletter-error" : undefined}
           aria-invalid={status === "error"}
-          className="flex-1 bg-white/5 border border-white/10 focus:border-brand-orange/60 focus:bg-white/8 rounded-xl px-4 py-3 text-white placeholder:text-white/25 text-sm outline-none transition-colors duration-200 disabled:opacity-50 aria-[invalid=true]:border-red-500/60"
+          className={`flex-1 ${inputClass} aria-[invalid=true]:border-red-500/60`}
         />
         <button
           type="submit"
@@ -127,7 +180,7 @@ export default function NewsletterForm() {
       </div>
 
       {status === "error" && (
-        <p id="newsletter-error" role="alert" className="mt-2.5 text-sm text-red-400">
+        <p id="newsletter-error" role="alert" className="text-sm text-red-400">
           {errorMessage}
         </p>
       )}

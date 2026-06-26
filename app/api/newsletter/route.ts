@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { email } = result.data;
+  const { email, firstName, lastName } = result.data;
 
   // Graceful degradation if Supabase isn't wired up yet
   const supabase = getSupabaseClient();
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   // Insert — Supabase will throw a unique-violation error for duplicates
   const { error } = await supabase
     .from("subscribers")
-    .insert({ email: email.toLowerCase() });
+    .insert({ email: email.toLowerCase(), first_name: firstName, last_name: lastName });
 
   if (error) {
     // Postgres unique violation code
