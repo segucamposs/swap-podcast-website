@@ -45,7 +45,7 @@ export default async function AboutPage() {
               "radial-gradient(ellipse 70% 60% at 30% 50%, rgba(255,117,31,0.06) 0%, transparent 70%)",
           }}
         />
-        <div className="relative max-w-4xl mx-auto">
+        <div className="relative max-w-4xl mx-auto text-center">
           <p className="text-brand-orange text-sm font-medium uppercase tracking-widest font-mono mb-6">
             Quiénes somos
           </p>
@@ -53,13 +53,13 @@ export default async function AboutPage() {
             Somos dos pibes de Buenos Aires con muchas preguntas
             <span className="text-brand-orange"> y las personas para responderlas.</span>
           </h1>
-          <p className="text-white/55 text-lg sm:text-xl leading-relaxed max-w-2xl">
+          <p className="text-white/55 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto">
             SWAP nació de algo simple: ¿qué pasa si le preguntamos a las personas
             que admiramos todo lo que siempre quisimos saber? Empezamos el podcast
             porque queríamos aprender — y resultó que no éramos los únicos.
           </p>
 
-          <div className="flex flex-wrap gap-8 mt-12">
+          <div className="flex flex-wrap gap-8 mt-12 justify-center">
             <div>
               <p className="text-4xl font-bold text-brand-orange">{episodeCount}</p>
               <p className="text-white/40 text-sm mt-1">episodios</p>

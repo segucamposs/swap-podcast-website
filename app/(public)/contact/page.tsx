@@ -13,7 +13,7 @@ export default function ContactPage() {
     <div className="bg-black min-h-screen">
       {/* Header */}
       <section className="bg-zinc-950 border-b border-white/5 py-16 px-4">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-3xl mx-auto text-center">
           <p className="text-brand-orange text-sm font-medium uppercase tracking-widest font-mono mb-3">
             Contacto
           </p>
