@@ -66,32 +66,19 @@ export default async function HomePage() {
           <Image
             src="/logo/swap-logo-transparent.png"
             alt="SWAP Podcast"
-            width={160}
-            height={64}
+            width={4923}
+            height={1357}
             priority
-            className="mx-auto mb-10 h-16 w-auto"
+            className="mx-auto mb-8 h-28 sm:h-36 lg:h-44 w-auto"
           />
 
           {/* Episode count badge */}
-          <div className="inline-flex items-center gap-2 bg-brand-orange/10 border border-brand-orange/25 rounded-full px-4 py-1.5 mb-8">
+          <div className="inline-flex items-center gap-2 bg-brand-orange/10 border border-brand-orange/25 rounded-full px-4 py-1.5 mb-10">
             <span className="w-1.5 h-1.5 rounded-full bg-brand-orange animate-pulse" aria-hidden="true" />
             <span className="text-brand-orange text-xs font-medium font-mono">
               {episodeCount} episodios publicados
             </span>
           </div>
-
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-6">
-            Conversaciones reales
-            <br />
-            <span className="text-brand-orange">
-              para pibes que construyen.
-            </span>
-          </h1>
-
-          <p className="text-white/55 text-lg sm:text-xl leading-relaxed max-w-xl mx-auto mb-10">
-            El podcast para los que tienen más de una pasión y no saben qué
-            hacer con ellas. En español, sin filtros, sin poses.
-          </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a

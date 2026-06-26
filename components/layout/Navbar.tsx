@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 
 const NAV_LINKS = [
@@ -26,16 +25,9 @@ export default function Navbar() {
         className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20"
         aria-label="Navegación principal"
       >
-        {/* Logo */}
-        <Link href="/" aria-label="SWAP Podcast — Inicio" className="shrink-0">
-          <Image
-            src="/logo/swap-logo-transparent.png"
-            alt="SWAP Podcast"
-            width={4923}
-            height={1357}
-            priority
-            className="h-7 sm:h-8 w-auto"
-          />
+        {/* Wordmark */}
+        <Link href="/" aria-label="SWAP Podcast — Inicio" className="shrink-0 font-bold text-white text-lg tracking-wider">
+          SWAP<span className="text-brand-orange">.</span>
         </Link>
 
         {/* Desktop links */}
