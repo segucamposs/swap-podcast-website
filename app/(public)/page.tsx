@@ -62,41 +62,46 @@ export default async function HomePage() {
           }}
         />
 
-        <div className="relative z-10 text-center max-w-3xl mx-auto animate-fade-in-up">
-          <Image
-            src="/logo/swap-logo-transparent.png"
-            alt="SWAP Podcast"
-            width={4923}
-            height={1357}
-            priority
-            className="mx-auto mb-8 h-28 sm:h-36 lg:h-44 w-auto"
-          />
-
-          {/* Episode count badge */}
-          <div className="inline-flex items-center gap-2 bg-brand-orange/10 border border-brand-orange/25 rounded-full px-4 py-1.5 mb-10">
-            <span className="w-1.5 h-1.5 rounded-full bg-brand-orange animate-pulse" aria-hidden="true" />
-            <span className="text-brand-orange text-xs font-medium font-mono">
-              {episodeCount} episodios publicados
-            </span>
+        <div className="relative z-10 text-center w-full animate-fade-in-up">
+          {/* Logo — wide, fills viewport */}
+          <div className="max-w-5xl mx-auto px-2 mb-8">
+            <Image
+              src="/logo/swap-logo-transparent.png"
+              alt="SWAP Podcast"
+              width={4923}
+              height={1357}
+              priority
+              className="w-full h-auto"
+            />
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="https://open.spotify.com/show/1t25iC8KdPXDZ9BUr1KgxY"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 bg-brand-orange text-white font-semibold px-8 py-3.5 rounded-full hover:bg-brand-orange/85 transition-colors duration-200"
-            >
-              <Image src="/icons/spotify.png" alt="" width={18} height={18} className="object-contain brightness-0 invert" />
-              Escuchar en Spotify
-            </a>
+          {/* Episode count badge + CTAs — narrower */}
+          <div className="max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 bg-brand-orange/10 border border-brand-orange/25 rounded-full px-4 py-1.5 mb-10">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-orange animate-pulse" aria-hidden="true" />
+              <span className="text-brand-orange text-xs font-medium font-mono">
+                {episodeCount} episodios publicados
+              </span>
+            </div>
 
-            <Link
-              href="/episodes"
-              className="inline-flex items-center justify-center border border-white/20 text-white font-medium px-8 py-3.5 rounded-full hover:border-brand-orange hover:text-brand-orange transition-colors duration-200"
-            >
-              Ver todos los episodios
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="https://open.spotify.com/show/1t25iC8KdPXDZ9BUr1KgxY"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 bg-brand-orange text-white font-semibold px-8 py-3.5 rounded-full hover:bg-brand-orange/85 transition-colors duration-200"
+              >
+                <Image src="/icons/spotify.png" alt="" width={18} height={18} className="object-contain brightness-0 invert" />
+                Escuchar en Spotify
+              </a>
+
+              <Link
+                href="/episodes"
+                className="inline-flex items-center justify-center border border-white/20 text-white font-medium px-8 py-3.5 rounded-full hover:border-brand-orange hover:text-brand-orange transition-colors duration-200"
+              >
+                Ver todos los episodios
+              </Link>
+            </div>
           </div>
         </div>
       </section>
