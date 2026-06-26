@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+/* ─── Brand tokens ───────────────────────────────────────── */
+@theme {
+  /* Colors */
+  --color-brand-orange: #ff751f;
+  --color-brand-gray: #a6a6a6;
+
+  /* Fonts — vars set by next/font on <html> */
+  --font-sans: var(--font-poppins), sans-serif;
+  --font-heading: var(--font-space-grotesk), sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+
+  /* Animations */
+  --animate-fade-in-up: fade-in-up 0.7s ease-out both;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Base ───────────────────────────────────────────────── */
+:root {
+  --background: #000000;
+  --foreground: #ffffff;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Headings — Space Grotesk ───────────────────────────── */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}
+
+/* ─── Accessibility — focus states (WCAG 2.1 AA) ────────── */
+:focus-visible {
+  outline: 2px solid #ff751f;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
