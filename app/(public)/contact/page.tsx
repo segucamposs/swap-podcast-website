@@ -44,7 +44,7 @@ export default function ContactPage() {
         {/* Potential guest */}
         <section aria-labelledby="guest-heading">
           <h2 id="guest-heading" className="text-2xl font-bold text-white mb-6">
-            Escribinos!
+            ¿Querés ser invitado? Escribinos!
           </h2>
           <a
             href="mailto:podcastswap@gmail.com?subject=Quiero ser invitado en SWAP"
