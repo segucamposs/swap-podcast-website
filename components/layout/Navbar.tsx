@@ -23,18 +23,18 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-black/95 backdrop-blur-sm border-b border-white/5">
       <nav
-        className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16"
+        className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20"
         aria-label="Navegación principal"
       >
         {/* Logo */}
-        <Link href="/" aria-label="SWAP Podcast — Inicio">
+        <Link href="/" aria-label="SWAP Podcast — Inicio" className="shrink-0">
           <Image
             src="/logo/swap-logo-transparent.png"
             alt="SWAP Podcast"
-            width={88}
-            height={36}
+            width={4923}
+            height={1357}
             priority
-            className="h-8 w-auto"
+            className="h-7 sm:h-8 w-auto"
           />
         </Link>
 
