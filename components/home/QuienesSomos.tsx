@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   motion,
   useScroll,
@@ -43,6 +43,7 @@ function MaskLine({
 export default function QuienesSomos() {
   const sectionRef = useRef<HTMLElement>(null);
   const inView     = useInView(sectionRef, { once: true, margin: "-5%" });
+  const [ctaHovered, setCtaHovered] = useState(false);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -156,38 +157,62 @@ export default function QuienesSomos() {
             transition={{ duration: 0.6, delay: 0.8, ease: EASE }}
           >
             {[
-              { nick: "Segu", full: "Segundo Campos",   orange: true,  handle: "@segucampos", href: "https://instagram.com/segucampos" },
-              { nick: "Fran", full: "Francisco Bottaro", orange: false, handle: null,           href: null },
+              { full: "Segundo Campos",   orange: true  },
+              { full: "Francisco Bottaro", orange: false },
             ].map((h) => (
-              <div key={h.nick} className="flex items-center gap-3">
+              <div key={h.full} className="flex items-center gap-3">
                 <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${h.orange ? "bg-brand-orange" : "bg-white/25"}`} />
                 <span className="text-white/80 text-sm font-semibold">{h.full}</span>
-                <span className="text-white/30 text-xs font-mono">{h.nick}</span>
-                {h.href && (
-                  <a
-                    href={h.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="ml-auto text-white/25 text-xs font-mono hover:text-brand-orange transition-colors duration-200"
-                  >
-                    {h.handle}
-                  </a>
-                )}
               </div>
             ))}
           </motion.div>
 
           {/* CTA */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={inView ? { opacity: 1 } : { opacity: 0 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
             transition={{ duration: 0.5, delay: 0.95 }}
           >
-            <Link
-              href="/about"
-              className="text-sm text-white/30 hover:text-brand-orange transition-colors duration-200 font-mono tracking-wide"
-            >
-              Conocé más sobre SWAP →
+            <Link href="/about" aria-label="Conocé más sobre SWAP">
+              <motion.div
+                onHoverStart={() => setCtaHovered(true)}
+                onHoverEnd={() => setCtaHovered(false)}
+                className="relative inline-flex items-center gap-3 border border-white/15 rounded-full px-7 py-3.5 overflow-hidden cursor-pointer"
+                animate={{ borderColor: ctaHovered ? "rgba(255,117,31,0.5)" : "rgba(255,255,255,0.15)" }}
+                transition={{ duration: 0.3 }}
+              >
+                {/* Fill sweep */}
+                <motion.span
+                  aria-hidden
+                  className="absolute inset-0 rounded-full bg-brand-orange"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: ctaHovered ? 1 : 0 }}
+                  transition={{ duration: 0.35, ease: [0.76, 0, 0.24, 1] }}
+                  style={{ transformOrigin: "left" }}
+                />
+
+                {/* Label */}
+                <motion.span
+                  className="relative z-10 text-sm font-semibold tracking-wide"
+                  animate={{ color: ctaHovered ? "#ffffff" : "rgba(255,255,255,0.75)" }}
+                  transition={{ duration: 0.2 }}
+                >
+                  Conocé más sobre SWAP
+                </motion.span>
+
+                {/* Arrow */}
+                <motion.span
+                  aria-hidden
+                  className="relative z-10 text-base leading-none"
+                  animate={{
+                    x: ctaHovered ? 4 : 0,
+                    color: ctaHovered ? "#ffffff" : "rgba(255,117,31,1)",
+                  }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                >
+                  →
+                </motion.span>
+              </motion.div>
             </Link>
           </motion.div>
 

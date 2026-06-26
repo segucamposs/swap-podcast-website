@@ -2,6 +2,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import StickyHeader from "@/components/layout/StickyHeader";
 import LenisProvider from "@/components/providers/LenisProvider";
+import PageTransition from "@/components/providers/PageTransition";
 
 export default function PublicLayout({
   children,
@@ -10,6 +11,7 @@ export default function PublicLayout({
 }) {
   return (
     <LenisProvider>
+      <PageTransition />
       <StickyHeader />
       <Navbar />
       <main className="flex-1">{children}</main>
