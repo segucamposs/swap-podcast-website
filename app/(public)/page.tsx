@@ -217,40 +217,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Platforms strip ────────────────────────────────────────── */}
-      <section
-        className="bg-black border-t border-white/5 py-14 px-4"
-        aria-label="Plataformas"
-      >
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-white/30 text-sm uppercase tracking-widest mb-6 font-mono">
-            Disponible en
-          </p>
-          <div className="flex flex-wrap justify-center gap-6">
-            {[
-              {
-                label: "Spotify",
-                href: "https://open.spotify.com/show/1t25iC8KdPXDZ9BUr1KgxY",
-              },
-              {
-                label: "Apple Podcasts",
-                href: "https://podcasts.apple.com/ar/podcast/swap-podcast/id1830727081",
-              },
-              { label: "YouTube", href: "https://youtube.com/@SwapPodcast" },
-            ].map((p) => (
-              <a
-                key={p.label}
-                href={p.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white/50 font-medium hover:text-brand-orange transition-colors duration-200 text-sm"
-              >
-                {p.label}
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
     </>
   );
 }
