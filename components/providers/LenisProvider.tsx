@@ -1,12 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import Lenis from "lenis";
-import { frame } from "motion/react";
 
 export default function LenisProvider({ children }: { children: React.ReactNode }) {
-  const lenisRef = useRef<Lenis | null>(null);
-
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.3,
@@ -17,14 +14,17 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
       touchMultiplier: 1.5,
     });
 
-    lenisRef.current = lenis;
+    let rafId: number;
 
-    // Sync Lenis RAF with Framer Motion's frame loop so scroll values stay in sync
-    const update = (data: { timestamp: number }) => lenis.raf(data.timestamp);
-    frame.update(update, true);
+    function raf(time: number) {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    }
+
+    rafId = requestAnimationFrame(raf);
 
     return () => {
-      frame.cancelUpdate(update);
+      cancelAnimationFrame(rafId);
       lenis.destroy();
     };
   }, []);
