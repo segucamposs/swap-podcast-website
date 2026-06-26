@@ -7,7 +7,7 @@ import {
 } from "@/lib/episodes/feed";
 import EpisodeCard from "@/components/episodes/EpisodeCard";
 import GuestCard from "@/components/guests/GuestCard";
-import AudioPlayer from "@/components/episodes/AudioPlayer";
+import SpotifyPlayerCard from "@/components/episodes/SpotifyPlayerCard";
 import NewsletterForm from "@/components/newsletter/NewsletterForm";
 import SocialLinks from "@/components/layout/SocialLinks";
 
@@ -116,42 +116,7 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            {latestEpisode.audioUrl ? (
-              <AudioPlayer
-                src={latestEpisode.audioUrl}
-                episodeSlug={latestEpisode.slug}
-                title={latestEpisode.title}
-                guest={latestEpisode.guest}
-                artworkUrl={latestEpisode.artworkUrl}
-              />
-            ) : (
-              /* Fallback if no audio URL */
-              <div className="bg-zinc-900 border border-white/8 rounded-2xl p-6 flex flex-col sm:flex-row gap-5 items-start sm:items-center">
-                {latestEpisode.artworkUrl && (
-                  <Image
-                    src={latestEpisode.artworkUrl}
-                    alt={latestEpisode.guest}
-                    width={80}
-                    height={80}
-                    className="rounded-xl flex-shrink-0"
-                  />
-                )}
-                <div className="flex-1">
-                  <p className="text-brand-orange text-xs font-medium uppercase tracking-wider mb-1">
-                    {latestEpisode.guest}
-                  </p>
-                  <p className="text-white font-semibold mb-4">{latestEpisode.title}</p>
-                  <a
-                    href={latestEpisode.spotifyUrl ?? "https://open.spotify.com/show/1t25iC8KdPXDZ9BUr1KgxY"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-brand-orange text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-brand-orange/85 transition-colors duration-200"
-                  >
-                    Escuchar en Spotify →
-                  </a>
-                </div>
-              </div>
-            )}
+            <SpotifyPlayerCard episode={latestEpisode} />
           </div>
         </section>
       )}
