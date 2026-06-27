@@ -70,7 +70,7 @@ export default function QuienesSomos() {
     >
       {/* ── Photo — top, full width ───────── */}
       <motion.div
-        className="relative w-full h-[520px] sm:h-[660px] pointer-events-none select-none overflow-hidden"
+        className="relative w-full h-[640px] sm:h-[820px] pointer-events-none select-none overflow-hidden"
         style={{ scale: imageScale, opacity: imageOpacity }}
       >
         {/* Inner wrapper carries the crop transform — keeps it off the <img> so
