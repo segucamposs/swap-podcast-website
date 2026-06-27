@@ -80,7 +80,7 @@ export default function QuienesSomos() {
           style={{ transform: "scale(1.12) translateX(-5%) translateY(3%)" }}
         >
           <Image
-            src="/images/quienes-somos-bg.png"
+            src="/images/quienes-somos-bg.webp"
             alt=""
             fill
             sizes="100vw"
