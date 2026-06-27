@@ -77,14 +77,13 @@ export default function QuienesSomos() {
             Next.js image optimization doesn't interact with scale in production */}
         <div
           className="absolute inset-0"
-          style={{ transform: "scale(1.05) translateX(-5%) translateY(3%)" }}
+          style={{ transform: "scale(1.12) translateX(-5%) translateY(3%)" }}
         >
           <Image
             src="/images/quienes-somos-bg.png"
             alt=""
             fill
             sizes="100vw"
-            unoptimized
             className="object-cover"
             style={{ objectPosition: "center 10%" }}
             aria-hidden
