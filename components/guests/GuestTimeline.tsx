@@ -75,23 +75,6 @@ function monthYear(iso: string): string {
     .replace(".", "");
 }
 
-/** Episode summary = the intro paragraph, before the "what we cover" list. */
-function episodeSummary(ep: Episode): string {
-  let d = (ep.description ?? "").replace(/\s+/g, " ").trim();
-  const idx = d.search(/en este episodio/i);
-  if (idx > 40) d = d.slice(0, idx).trim();
-  if (d.length > 175) {
-    const slice = d.slice(0, 175);
-    const end = Math.max(
-      slice.lastIndexOf(". "),
-      slice.lastIndexOf("? "),
-      slice.lastIndexOf("! "),
-    );
-    d = end > 90 ? slice.slice(0, end + 1) : slice.replace(/\s+\S*$/, "") + "…";
-  }
-  return d || ep.topic || "";
-}
-
 type Node = { x: number; y: number; side: "left" | "right"; ep: Episode };
 
 /**
@@ -134,7 +117,6 @@ function TimelineStop({ node, topPct }: { node: Node; topPct: number }) {
 
   const meta = getGuestMeta(ep.slug);
   const photo = meta?.photo ?? ep.artworkUrl ?? ep.thumbnailUrl ?? null;
-  const summary = meta?.summary ?? episodeSummary(ep);
 
   return (
     <div
@@ -151,8 +133,8 @@ function TimelineStop({ node, topPct }: { node: Node; topPct: number }) {
             ratio so nothing is cropped; always opaque so it cleanly masks the
             line behind it (no bleed-through at the junction). */}
         <div
-          style={{ aspectRatio: meta?.aspect ?? 16 / 9 }}
-          className="relative w-36 overflow-hidden rounded-2xl border-2 border-brand-orange/70 bg-zinc-900 shadow-[0_0_0_5px_rgba(255,117,31,0.12)] transition-transform duration-500 group-hover:scale-105 sm:w-52"
+          style={{ aspectRatio: meta?.aspect ?? 900 / 405 }}
+          className="relative w-40 overflow-hidden rounded-2xl border-2 border-brand-orange/70 bg-zinc-900 shadow-[0_0_0_5px_rgba(255,117,31,0.12)] transition-transform duration-500 group-hover:scale-105 sm:w-56"
         >
           {photo ? (
             <Image
@@ -171,24 +153,25 @@ function TimelineStop({ node, topPct }: { node: Node; topPct: number }) {
           )}
         </div>
 
-        {/* Text — beside the photo, on the open side (toward center) */}
+        {/* Text — beside the photo, on the open side (toward center).
+            Guest name is the headline; episode title sits small underneath. */}
         <motion.div
           style={{ opacity }}
           className={[
-            "absolute top-1/2 -translate-y-1/2 w-[clamp(8.5rem,40vw,18rem)]",
+            "absolute top-1/2 -translate-y-1/2 w-[clamp(9rem,42vw,20rem)]",
             isLeft
-              ? "left-full ml-3 text-left sm:ml-5"
-              : "right-full mr-3 text-right sm:mr-5",
+              ? "left-full ml-4 text-left sm:ml-6"
+              : "right-full mr-4 text-right sm:mr-6",
           ].join(" ")}
         >
-          <p className="font-mono text-[11px] uppercase tracking-widest text-brand-orange">
-            {monthYear(ep.publishedAt)} · {ep.guest}
+          <p className="mb-1.5 font-mono text-[11px] uppercase tracking-widest text-brand-orange">
+            {monthYear(ep.publishedAt)}
           </p>
-          <h3 className="mt-1 line-clamp-2 text-base font-bold leading-snug text-white transition-colors duration-200 group-hover:text-brand-orange sm:text-xl">
-            {ep.title}
+          <h3 className="text-2xl font-bold leading-[1.1] text-white transition-colors duration-200 group-hover:text-brand-orange sm:text-3xl">
+            {ep.guest}
           </h3>
-          <p className="mt-1.5 line-clamp-3 text-xs leading-relaxed text-white/50 sm:text-sm">
-            {summary}
+          <p className="mt-2 line-clamp-2 text-sm leading-snug text-white/55">
+            {ep.title}
           </p>
         </motion.div>
       </Link>
