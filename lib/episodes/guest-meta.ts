@@ -28,14 +28,16 @@ export interface GuestMeta {
   summary?: string;
 }
 
+// `aspect` is set only when the photo isn't ~16:9, so the frame hugs the real
+// image and nothing is cropped or letterboxed.
 export const guestMeta: Record<string, GuestMeta> = {
-  "tomas-marra": { photo: "/images/guests/tomas-marra.jpg" },
-  "justo-mimessi": { photo: "/images/guests/justo-mimessi.jpg" },
-  "bauti-mazzei": { photo: "/images/guests/bauti-mazzei.jpg" },
-  "fernando-martin-ayala": { photo: "/images/guests/fernando-martin-ayala.jpg" },
-  "toto-artuso": { photo: "/images/guests/toto-artuso.jpg" },
-  "bernardo-barcena": { photo: "/images/guests/bernardo-barcena.jpg" },
-  "rafa-smith-estrada": { photo: "/images/guests/rafa-smith-estrada.jpg", aspect: 5 / 3 },
+  "tomas-marra": { photo: "/images/guests/tomas-marra.jpg", aspect: 1.926 },
+  "justo-mimessi": { photo: "/images/guests/justo-mimessi.jpg", aspect: 1.845 },
+  "bauti-mazzei": { photo: "/images/guests/bauti-mazzei.jpg", aspect: 1.929 },
+  "fernando-martin-ayala": { photo: "/images/guests/fernando-martin-ayala.jpg", aspect: 2.152 },
+  "toto-artuso": { photo: "/images/guests/toto-artuso.jpg", aspect: 2.148 },
+  "bernardo-barcena": { photo: "/images/guests/bernardo-barcena.jpg", aspect: 1.708 },
+  "rafa-smith-estrada": { photo: "/images/guests/rafa-smith-estrada.jpg", aspect: 4 / 3 },
   "mauro-dominguez": { photo: "/images/guests/mauro-dominguez.jpg" },
   "francis-holway": { photo: "/images/guests/francis-holway.jpg" },
   "ivan-briones": { photo: "/images/guests/ivan-briones.jpg" },

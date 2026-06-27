@@ -133,7 +133,7 @@ function TimelineStop({ node, topPct }: { node: Node; topPct: number }) {
             ratio so nothing is cropped; always opaque so it cleanly masks the
             line behind it (no bleed-through at the junction). */}
         <div
-          style={{ aspectRatio: meta?.aspect ?? 900 / 405 }}
+          style={{ aspectRatio: meta?.aspect ?? 16 / 9 }}
           className="relative w-40 overflow-hidden rounded-2xl border-2 border-brand-orange/70 bg-zinc-900 shadow-[0_0_0_5px_rgba(255,117,31,0.12)] transition-transform duration-500 group-hover:scale-105 sm:w-56"
         >
           {photo ? (
