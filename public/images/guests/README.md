@@ -1,24 +1,22 @@
 # Guest photos — timeline
 
-Candid photo we take with each guest at the end of the recording.
+The candid photo we take with each guest at the end of the recording. Wired up
+in `lib/episodes/guest-meta.ts` (keyed by guest slug).
 
-**Format:** portrait or 4:3, ~1200px on the short side, `.webp`, named exactly by guest slug.
+**Format:** `<slug>.jpg`, ~900px max side (converted from the originals with
+`sips -s format jpeg -Z 900`). Drop originals anywhere under
+`public/images/guests pictures/` (gitignored) and convert into here.
 
-Drop the file here, then set `photo: "/images/guests/<slug>.webp"` in
-`lib/episodes/guest-meta.ts`. Until then the timeline falls back to the episode
-cover art.
+A guest shows in the timeline once their episode is live in the RSS feed AND
+they have a `photo` set in `guest-meta.ts`.
 
-## Slots needed (oldest → newest)
+## In the timeline (live)
 
-- [ ] `tomas-marra.webp` — Tomás Marra
-- [ ] `justo-mimessi.webp` — Justo Mimessi
-- [ ] `bauti-mazzei.webp` — Bauti Mazzei
-- [ ] `fernando-martin-ayala.webp` — Fernando Martín Ayala
-- [ ] `toto-artuso.webp` — Toto Artuso
-- [ ] `bernardo-barcena.webp` — Bernardo Bárcena
-- [ ] `rafa-smith-estrada.webp` — Rafa Smith Estrada
-- [ ] `mauro-dominguez.webp` — Mauro Domínguez
-- [ ] `francis-holway.webp` — Francis Holway
-- [ ] `ivan-briones.webp` — Iván Briones
-- [ ] `eduardo-martins.webp` — Eduardo Martins
-- [ ] `tomas-moreno.webp` — Tomás Moreno
+`tomas-marra` · `justo-mimessi` · `bauti-mazzei` · `fernando-martin-ayala` ·
+`toto-artuso` · `bernardo-barcena` · `rafa-smith-estrada` · `mauro-dominguez` ·
+`francis-holway` · `ivan-briones` · `eduardo-martins` · `tomas-moreno`
+
+## Ready, pending publish (not yet in the RSS feed)
+
+`rolo-schiavi` (24) · `andres-rieznik` (26) · `juampi-hernandez` (27) — photos
+are in place; they surface automatically once the episodes hit the feed.

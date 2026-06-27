@@ -6,14 +6,13 @@
  * lives here, keyed by guest slug.
  *
  * To add a guest:
- *   1. Drop the candid photo in `public/images/guests/<slug>.webp`
- *      (portrait or square, ~1000px, webp).
- *   2. Set `photo: "/images/guests/<slug>.webp"` below.
+ *   1. Drop the candid photo in `public/images/guests/<slug>.jpg`.
+ *   2. Set `photo: "/images/guests/<slug>.jpg"` below.
  *
- * Until a `photo` is set, the timeline falls back to the episode cover art,
- * so the page always renders. The episode title + summary come straight from
- * the feed — no need to write them here. Use the optional `summary` only to
- * override the auto-generated one.
+ * A guest only appears in the timeline once their episode is live in the RSS
+ * feed AND they have an entry here. Entries whose episode isn't published yet
+ * (e.g. Rolo Schiavi, Andrés Rieznik, Juampi Hernández) sit ready and surface
+ * automatically when the feed catches up.
  *
  * When Supabase is wired up, this module gets replaced by a table read — the
  * timeline component consumes `GuestMeta` and won't need to change.
@@ -26,20 +25,24 @@ export interface GuestMeta {
   summary?: string;
 }
 
-// ⚠️ Photos pending — drop files in public/images/guests/ and flip `photo` on.
 export const guestMeta: Record<string, GuestMeta> = {
-  "tomas-marra": { photo: null },
-  "justo-mimessi": { photo: null },
-  "bauti-mazzei": { photo: null },
-  "fernando-martin-ayala": { photo: null },
-  "toto-artuso": { photo: null },
-  "bernardo-barcena": { photo: null },
-  "rafa-smith-estrada": { photo: null },
-  "mauro-dominguez": { photo: null },
-  "francis-holway": { photo: null },
-  "ivan-briones": { photo: null },
-  "eduardo-martins": { photo: null },
-  "tomas-moreno": { photo: null },
+  "tomas-marra": { photo: "/images/guests/tomas-marra.jpg" },
+  "justo-mimessi": { photo: "/images/guests/justo-mimessi.jpg" },
+  "bauti-mazzei": { photo: "/images/guests/bauti-mazzei.jpg" },
+  "fernando-martin-ayala": { photo: "/images/guests/fernando-martin-ayala.jpg" },
+  "toto-artuso": { photo: "/images/guests/toto-artuso.jpg" },
+  "bernardo-barcena": { photo: "/images/guests/bernardo-barcena.jpg" },
+  "rafa-smith-estrada": { photo: "/images/guests/rafa-smith-estrada.jpg" },
+  "mauro-dominguez": { photo: "/images/guests/mauro-dominguez.jpg" },
+  "francis-holway": { photo: "/images/guests/francis-holway.jpg" },
+  "ivan-briones": { photo: "/images/guests/ivan-briones.jpg" },
+  "eduardo-martins": { photo: "/images/guests/eduardo-martins.jpg" },
+  "tomas-moreno": { photo: "/images/guests/tomas-moreno.jpg" },
+
+  // Recorded — photos ready, will appear once the episode hits the RSS feed.
+  "rolo-schiavi": { photo: "/images/guests/rolo-schiavi.jpg" },
+  "andres-rieznik": { photo: "/images/guests/andres-rieznik.jpg" },
+  "juampi-hernandez": { photo: "/images/guests/juampi-hernandez.jpg" },
 };
 
 export function getGuestMeta(slug: string): GuestMeta | undefined {
