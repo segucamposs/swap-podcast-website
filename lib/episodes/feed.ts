@@ -72,7 +72,7 @@ function durationToMs(duration: string): number | null {
 
 // ─── Supabase episode links ───────────────────────────────────────────────────
 
-type EpisodeLinks = Record<string, { spotifyUrl?: string; youtubeUrl?: string }>;
+type EpisodeLinks = Record<string, { spotifyUrl?: string; youtubeUrl?: string; appleUrl?: string }>;
 
 async function getEpisodeLinks(): Promise<EpisodeLinks> {
   const supabase = getSupabaseClient();
@@ -80,7 +80,7 @@ async function getEpisodeLinks(): Promise<EpisodeLinks> {
 
   const { data, error } = await supabase
     .from("episode_links")
-    .select("slug, spotify_url, youtube_url");
+    .select("slug, spotify_url, youtube_url, apple_url");
 
   if (error || !data) return {};
 
@@ -90,6 +90,7 @@ async function getEpisodeLinks(): Promise<EpisodeLinks> {
       {
         spotifyUrl: row.spotify_url ?? undefined,
         youtubeUrl: row.youtube_url ?? undefined,
+        appleUrl: row.apple_url ?? undefined,
       },
     ])
   );
@@ -143,7 +144,10 @@ export async function getAllEpisodes(): Promise<Episode[]> {
           supabaseLink?.spotifyUrl ??
           overrideLink?.spotifyUrl ??
           "https://open.spotify.com/show/1t25iC8KdPXDZ9BUr1KgxY",
-        appleUrl: null,
+        appleUrl:
+          supabaseLink?.appleUrl ??
+          overrideLink?.appleUrl ??
+          "https://podcasts.apple.com/ar/podcast/swap-podcast/id1830727081",
         publishedAt: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
         thumbnailUrl: artworkUrl || null,
         artworkUrl: artworkUrl || null,

@@ -6,7 +6,7 @@
  */
 export const episodeOverrides: Record<
   string,
-  { spotifyUrl?: string; youtubeUrl?: string }
+  { spotifyUrl?: string; youtubeUrl?: string; appleUrl?: string }
 > = {
   // ── Most recent (scraped) ────────────────────────────────────────────────
   "eduardo-martins": {
@@ -34,6 +34,7 @@ export const episodeOverrides: Record<
   "tomas-moreno": {
     spotifyUrl: "https://open.spotify.com/episode/36NI7BaQgU8wYrwgL7l08P",
     youtubeUrl: "https://www.youtube.com/watch?v=jkBuEbrVOwY",
+    appleUrl: "https://podcasts.apple.com/ar/podcast/swap-podcast/id1830727081?i=1000774401397",
   },
 
   // ── Older episodes — add Spotify episode URL + YouTube video URL below ──
