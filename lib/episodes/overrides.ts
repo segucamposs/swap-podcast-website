@@ -31,7 +31,7 @@ export const episodeOverrides: Record<
   "bernardo-barcena": {
     spotifyUrl: "https://open.spotify.com/episode/4a1uoXvYVU5FOKbULGpJ8t",
   },
-  "tomi-moreno": {
+  "tomas-moreno": {
     spotifyUrl: "https://open.spotify.com/episode/36NI7BaQgU8wYrwgL7l08P",
     youtubeUrl: "https://www.youtube.com/watch?v=jkBuEbrVOwY",
   },
