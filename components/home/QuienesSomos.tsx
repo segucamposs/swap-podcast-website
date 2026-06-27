@@ -84,7 +84,6 @@ export default function QuienesSomos() {
             alt=""
             fill
             sizes="100vw"
-            unoptimized
             className="object-cover"
             style={{ objectPosition: "center 10%" }}
             aria-hidden
