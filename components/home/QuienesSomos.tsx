@@ -77,7 +77,7 @@ export default function QuienesSomos() {
             Next.js image optimization doesn't interact with scale in production */}
         <div
           className="absolute inset-0"
-          style={{ transform: "scale(1.12) translateX(-5%) translateY(3%)" }}
+          style={{ transform: "scale(1.05) translateX(0%) translateY(3%)" }}
         >
           <Image
             src="/images/quienes-somos-bg.webp"
@@ -95,7 +95,7 @@ export default function QuienesSomos() {
           style={{
             background: [
               "linear-gradient(to bottom, black 0%, rgba(0,0,0,0.55) 6%, rgba(0,0,0,0.1) 18%, transparent 30%)",
-              "linear-gradient(to top,    black 0%, rgba(0,0,0,0.55) 14%, transparent 32%)",
+              "linear-gradient(to top,    black 0%, rgba(0,0,0,0.35) 7%, transparent 18%)",
               "linear-gradient(to right,  black 0%, rgba(0,0,0,0.45) 10%, transparent 26%)",
               "linear-gradient(to left,   black 0%, rgba(0,0,0,0.45) 10%, transparent 26%)",
             ].join(", "),
