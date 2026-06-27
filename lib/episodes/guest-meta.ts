@@ -21,6 +21,9 @@
 export interface GuestMeta {
   /** Candid photo taken with the guest. `null` → fall back to cover art. */
   photo: string | null;
+  /** Photo aspect ratio (width / height). Defaults to 16/9; set when it differs
+   *  so the frame hugs the image and nothing gets cropped. */
+  aspect?: number;
   /** Optional — override the auto summary pulled from the feed. */
   summary?: string;
 }
@@ -32,7 +35,7 @@ export const guestMeta: Record<string, GuestMeta> = {
   "fernando-martin-ayala": { photo: "/images/guests/fernando-martin-ayala.jpg" },
   "toto-artuso": { photo: "/images/guests/toto-artuso.jpg" },
   "bernardo-barcena": { photo: "/images/guests/bernardo-barcena.jpg" },
-  "rafa-smith-estrada": { photo: "/images/guests/rafa-smith-estrada.jpg" },
+  "rafa-smith-estrada": { photo: "/images/guests/rafa-smith-estrada.jpg", aspect: 4 / 3 },
   "mauro-dominguez": { photo: "/images/guests/mauro-dominguez.jpg" },
   "francis-holway": { photo: "/images/guests/francis-holway.jpg" },
   "ivan-briones": { photo: "/images/guests/ivan-briones.jpg" },

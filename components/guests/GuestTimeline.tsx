@@ -147,15 +147,19 @@ function TimelineStop({ node, topPct }: { node: Node; topPct: number }) {
         className="group relative block"
         aria-label={`Escuchar episodio con ${ep.guest}`}
       >
-        {/* Photo — centered on the curve point. Always opaque so it cleanly
-            masks the line behind it (no bleed-through at the junction). */}
-        <div className="relative h-20 w-20 overflow-hidden rounded-2xl border-2 border-brand-orange/70 bg-zinc-900 shadow-[0_0_0_5px_rgba(255,117,31,0.12)] transition-transform duration-500 group-hover:scale-105 sm:h-28 sm:w-28">
+        {/* Photo — centered on the curve point. Frame hugs the image's aspect
+            ratio so nothing is cropped; always opaque so it cleanly masks the
+            line behind it (no bleed-through at the junction). */}
+        <div
+          style={{ aspectRatio: meta?.aspect ?? 16 / 9 }}
+          className="relative w-36 overflow-hidden rounded-2xl border-2 border-brand-orange/70 bg-zinc-900 shadow-[0_0_0_5px_rgba(255,117,31,0.12)] transition-transform duration-500 group-hover:scale-105 sm:w-52"
+        >
           {photo ? (
             <Image
               src={photo}
               alt={`${ep.guest} en SWAP Podcast`}
               fill
-              sizes="(max-width: 640px) 80px, 112px"
+              sizes="(max-width: 640px) 144px, 208px"
               className="object-cover"
             />
           ) : (
