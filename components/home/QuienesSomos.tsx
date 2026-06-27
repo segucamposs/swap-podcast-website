@@ -115,7 +115,7 @@ export default function QuienesSomos() {
         <div className="hidden sm:block" />
 
         {/* Right: copy */}
-        <div className="flex flex-col justify-center px-8 sm:px-12 pt-12 pb-24 bg-black">
+        <div className="flex flex-col justify-center items-center text-center px-6 sm:px-8 py-8 bg-black">
 
           {/* Label */}
           <motion.p
@@ -130,10 +130,10 @@ export default function QuienesSomos() {
           {/* Headline */}
           <h2 className="text-4xl sm:text-5xl font-black mb-7">
             <MaskLine delay={0.3} inView={inView}>
-              Dos pibes que
+              Dos pibes que tienen
             </MaskLine>
-            <MaskLine delay={0.48} inView={inView}>
-              tienen <span className="text-brand-orange">muchas preguntas.</span>
+            <MaskLine delay={0.48} inView={inView} className="text-brand-orange">
+              muchas preguntas.
             </MaskLine>
           </h2>
 
