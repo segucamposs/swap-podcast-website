@@ -50,6 +50,13 @@ function parseTitle(title: string): { topic: string; guest: string } {
     const guest = title.slice(idx + 3).trim();
     return { topic, guest };
   }
+  // Early-episode guest format: "Topic - Guest #N" or "Topic — con Guest #N".
+  // (Solo episodes start with "#N" instead, so they never match this.)
+  const endHash = title.match(/^(.*?)\s*[—–-]\s*(?:con\s+)?([^—–-]+?)\s*#\d+\s*$/i);
+  if (endHash) {
+    const topic = endHash[1].trim().replace(/^["'""]|["'""]$/g, "");
+    return { topic, guest: endHash[2].trim() };
+  }
   return { topic: title.trim(), guest: "" };
 }
 
