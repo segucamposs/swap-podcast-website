@@ -172,17 +172,8 @@ export async function getEpisodeBySlug(slug: string): Promise<Episode | undefine
 }
 
 export async function getEpisodeCount(): Promise<number> {
-  try {
-    const res = await fetch(ITUNES_API_URL, { next: { revalidate: 3600 } });
-    if (!res.ok) throw new Error();
-    const data = await res.json();
-    const show = (data.results as RawShow[])?.find(
-      (r) => r.wrapperType !== "podcastEpisode"
-    );
-    return show?.trackCount ?? 22;
-  } catch {
-    return 22;
-  }
+  const episodes = await getAllEpisodes();
+  return episodes.length;
 }
 
 /** Returns all episodes — each SWAP episode features one guest. */
