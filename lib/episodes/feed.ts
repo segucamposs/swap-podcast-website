@@ -5,6 +5,7 @@
  */
 import type { Episode } from "./types";
 import { getEpisodes as getFallbackEpisodes } from "./data";
+import { episodeOverrides } from "./overrides";
 import { getSupabaseClient } from "@/lib/supabase/client";
 
 const RSS_FEED_URL = "https://anchor.fm/s/1004ba98c/podcast/rss";
@@ -126,6 +127,8 @@ export async function getAllEpisodes(): Promise<Episode[]> {
       const pubDate = rssTag("pubDate", item);
       const audioUrl = rssAttr("enclosure", "url", item);
 
+      const episodeLink = links[slug] ?? episodeOverrides[slug];
+
       return {
         id: guid || String(idx),
         slug,
@@ -134,9 +137,9 @@ export async function getAllEpisodes(): Promise<Episode[]> {
         description,
         guest,
         guestBio: "",
-        youtubeUrl: links[slug]?.youtubeUrl ?? null,
+        youtubeUrl: episodeLink?.youtubeUrl ?? null,
         spotifyUrl:
-          links[slug]?.spotifyUrl ??
+          episodeLink?.spotifyUrl ??
           "https://open.spotify.com/show/1t25iC8KdPXDZ9BUr1KgxY",
         appleUrl: null,
         publishedAt: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
