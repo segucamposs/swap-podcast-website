@@ -178,7 +178,7 @@ export default async function AboutPage() {
               href="/contact"
               className="inline-flex items-center justify-center bg-brand-orange text-white font-semibold px-8 py-3.5 rounded-full hover:bg-brand-orange/85 transition-colors duration-200"
             >
-              Contactarnos
+              Proponer un episodio
             </Link>
             <Link
               href="/invitados"

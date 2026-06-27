@@ -43,9 +43,12 @@ export default function ContactPage() {
 
         {/* Potential guest */}
         <section aria-labelledby="guest-heading">
-          <h2 id="guest-heading" className="text-2xl font-bold text-white mb-6">
-            ¿Querés ser invitado? Escribinos!
+          <h2 id="guest-heading" className="text-2xl font-bold text-white mb-2">
+            ¿Querés venir al podcast?
           </h2>
+          <p className="text-white/45 text-base leading-relaxed mb-6 max-w-md">
+            No hace falta un currículum perfecto — solo algo real para decir. Escribinos y lo charlamos.
+          </p>
           <a
             href="mailto:podcastswap@gmail.com?subject=Quiero ser invitado en SWAP"
             className="inline-flex items-center gap-2 bg-brand-orange text-white font-semibold px-8 py-3.5 rounded-full hover:bg-brand-orange/85 transition-colors duration-200"
@@ -54,7 +57,7 @@ export default function ContactPage() {
               <rect x="2" y="4" width="20" height="16" rx="2" />
               <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
             </svg>
-            podcastswap@gmail.com
+            Proponer un episodio
           </a>
         </section>
 

@@ -115,7 +115,7 @@ export default function QuienesSomos() {
         <div className="hidden sm:block" />
 
         {/* Right: copy */}
-        <div className="flex flex-col justify-center px-8 sm:px-12 py-24 bg-black">
+        <div className="flex flex-col justify-center px-8 sm:px-12 pt-12 pb-24 bg-black">
 
           {/* Label */}
           <motion.p
@@ -130,42 +130,24 @@ export default function QuienesSomos() {
           {/* Headline */}
           <h2 className="text-4xl sm:text-5xl font-black mb-7">
             <MaskLine delay={0.3} inView={inView}>
-              Dos pibes que tienen
+              Dos pibes que
             </MaskLine>
-            <MaskLine delay={0.48} inView={inView} className="text-brand-orange">
-              muchas preguntas.
+            <MaskLine delay={0.48} inView={inView}>
+              tienen <span className="text-brand-orange">muchas preguntas.</span>
             </MaskLine>
           </h2>
 
-          {/* Body */}
-          <motion.p
-            className="text-white/55 text-base leading-relaxed mb-10 max-w-sm"
-            initial={{ opacity: 0, y: 14 }}
-            animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
-            transition={{ duration: 0.7, delay: 0.65, ease: EASE }}
-          >
-            SWAP es el podcast en español sobre salud, carrera, emprendimiento
-            e IA — sin postureo, sin guión. Para los que están construyendo
-            algo y todavía no tienen todo claro.
-          </motion.p>
-
           {/* Hosts */}
-          <motion.div
-            className="flex flex-col gap-3 mb-10"
+          <motion.p
+            className="text-white/50 text-sm font-medium mb-10 tracking-wide"
             initial={{ opacity: 0, y: 12 }}
             animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
-            transition={{ duration: 0.6, delay: 0.8, ease: EASE }}
+            transition={{ duration: 0.6, delay: 0.65, ease: EASE }}
           >
-            {[
-              { full: "Segundo Campos",   orange: true  },
-              { full: "Francisco Bottaro", orange: false },
-            ].map((h) => (
-              <div key={h.full} className="flex items-center gap-3">
-                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${h.orange ? "bg-brand-orange" : "bg-white/25"}`} />
-                <span className="text-white/80 text-sm font-semibold">{h.full}</span>
-              </div>
-            ))}
-          </motion.div>
+            Francisco Bottaro
+            <span className="mx-2.5 text-white/20">·</span>
+            Segundo Campos
+          </motion.p>
 
           {/* CTA */}
           <motion.div

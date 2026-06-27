@@ -23,7 +23,7 @@ export default async function InvitadosPage() {
             Invitados
           </p>
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-            Las personas detrás de SWAP
+            Las voces de SWAP
           </h1>
           <p className="text-white/40 text-lg mx-auto max-w-xl">
             {count} conversaciones con personas que tienen algo real para decir.
@@ -53,7 +53,7 @@ export default async function InvitadosPage() {
       <section className="bg-zinc-950 border-t border-white/5 py-20 px-4">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
-            ¿Querés venir al pod?
+            ¿Querés venir al podcast?
           </h2>
           <p className="text-white/50 text-lg leading-relaxed mb-8">
             Si tenés algo valioso para compartir con jóvenes de 16 a 25 años,
@@ -63,7 +63,7 @@ export default async function InvitadosPage() {
             href="/contact"
             className="inline-flex items-center justify-center bg-brand-orange text-white font-semibold px-8 py-3.5 rounded-full hover:bg-brand-orange/85 transition-colors duration-200"
           >
-            Escribirnos
+            Proponer un episodio
           </Link>
         </div>
       </section>

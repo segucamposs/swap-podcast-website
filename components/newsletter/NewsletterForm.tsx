@@ -101,9 +101,9 @@ export default function NewsletterForm() {
           </svg>
         </div>
         <p className="text-white font-semibold">
-          ¡Listo, {form.firstName || "ya sos parte de SWAP"}! Te avisamos cuando sale un nuevo episodio.
+          {form.firstName ? `Listo, ${form.firstName}.` : "Listo."} Te avisamos cuando sale un nuevo episodio.
         </p>
-        <p className="text-white/40 text-sm">Ya sos parte de SWAP.</p>
+        <p className="text-white/40 text-sm">Revisá spam si no te llega en los próximos días.</p>
       </div>
     );
   }
