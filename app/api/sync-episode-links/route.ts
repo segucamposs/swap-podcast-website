@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 const SPOTIFY_SHOW_ID   = "1t25iC8KdPXDZ9BUr1KgxY";
-const ITUNES_API_URL    = "https://itunes.apple.com/lookup?id=1830727081&country=ar&media=podcast&entity=podcastEpisode&limit=100";
+const RSS_FEED_URL      = "https://anchor.fm/s/1004ba98c/podcast/rss";
 const YT_CHANNEL_HANDLE = "SwapPodcast";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -75,33 +75,45 @@ async function getYouTubeVideos(apiKey: string) {
   }));
 }
 
-// ─── iTunes (raw, no Supabase merge needed here) ─────────────────────────────
+// ─── RSS feed (always current, unlike iTunes which can lag days) ──────────────
 
-async function getItunesEpisodes() {
-  const res = await fetch(ITUNES_API_URL, { next: { revalidate: 0 } });
+function extractCDATA(str: string): string {
+  return str.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1");
+}
+
+function rssTag(tag: string, xml: string): string {
+  const match = xml.match(new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tag}>`, "i"));
+  return match ? extractCDATA(match[1]).trim() : "";
+}
+
+function toSlug(str: string): string {
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+}
+
+async function getRssEpisodes() {
+  const res = await fetch(RSS_FEED_URL, { cache: "no-store" });
   if (!res.ok) return [];
-  const data = await res.json();
-  const results = (data.results ?? []) as {
-    wrapperType: string;
-    trackName?: string;
-    trackId?: number;
-    trackCount?: number;
-  }[];
+  const xml = await res.text();
 
-  const show      = results.find((r) => r.wrapperType !== "podcastEpisode");
-  const trackCount = (show as { trackCount?: number })?.trackCount ?? 22;
+  const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+  const episodes: { slug: string; guest: string }[] = [];
+  let m: RegExpExecArray | null;
 
-  return results
-    .filter((r) => r.wrapperType === "podcastEpisode")
-    .map((ep, idx) => {
-      const raw     = ep.trackName ?? "";
-      const sepIdx  = raw.lastIndexOf(" | ");
-      const guest   = sepIdx !== -1 ? raw.slice(sepIdx + 3).trim() : "";
-      const slug    = guest
-        ? guest.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-")
-        : `ep-${trackCount - idx}`;
-      return { slug, guest };
-    });
+  while ((m = itemRegex.exec(xml)) !== null) {
+    const title  = rssTag("title", m[1]);
+    const sepIdx = title.lastIndexOf(" | ");
+    const guest  = sepIdx !== -1 ? title.slice(sepIdx + 3).trim() : "";
+    const slug   = guest ? toSlug(guest) : "";
+    if (slug) episodes.push({ slug, guest });
+  }
+
+  return episodes;
 }
 
 // ─── Route handler ────────────────────────────────────────────────────────────
@@ -132,8 +144,8 @@ export async function GET(req: NextRequest) {
   const { data: existing } = await supabase.from("episode_links").select("slug");
   const existingSlugs = new Set((existing ?? []).map((r: { slug: string }) => r.slug));
 
-  // Get all episodes from iTunes
-  const itunesEps = await getItunesEpisodes();
+  // Get all episodes from RSS (always up-to-date)
+  const itunesEps = await getRssEpisodes();
   const newEps    = itunesEps.filter((ep) => !existingSlugs.has(ep.slug) && ep.guest);
 
   if (newEps.length === 0) {

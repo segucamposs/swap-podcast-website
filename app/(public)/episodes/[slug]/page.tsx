@@ -29,13 +29,23 @@ function parseDescription(description: string, guestName: string): ParsedDescrip
   let bullets: string[] = [];
   let bio = "";
 
-  if (bulletSection.includes("•")) {
-    // Format B: bullets are already separated by •
-    const [rawBullets, ...rest] = bulletSection.split("\n");
-    bullets = rawBullets.split("•").map((s) => s.trim()).filter(Boolean);
-    bio = rest.join("\n").trim();
+  if (bulletSection.includes("•") || bulletSection.includes("\n")) {
+    // RSS / newer iTunes: bullets separated by newlines and/or • characters
+    const parts = bulletSection
+      .split(/\n|(?<=[^\n])•/)
+      .map((s) => s.replace(/^•\s*/, "").trim())
+      .filter(Boolean);
+
+    const firstName = guestName.split(" ")[0];
+    const bioIndex = parts.findIndex((p) => p.startsWith(firstName));
+    if (bioIndex !== -1) {
+      bio = parts[bioIndex];
+      bullets = parts.filter((_, i) => i !== bioIndex);
+    } else {
+      bullets = parts;
+    }
   } else {
-    // Format A: bullets are concatenated — split before any uppercase+lowercase that
+    // Legacy concatenated format — split before any uppercase+lowercase that
     // follows a non-space character (handles letters, digits, punctuation like ")")
     const parts = bulletSection
       .split(/(?<=[^\s])(?=[A-ZÁÉÍÓÚÑÜ][a-záéíóúñü])/u)

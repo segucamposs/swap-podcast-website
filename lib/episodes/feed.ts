@@ -1,38 +1,13 @@
 /**
- * Live episode data from the iTunes/Apple Podcasts public API.
- * No authentication required. Revalidates every hour.
- *
- * Falls back to the static placeholders in ./data.ts if the API is
- * unreachable so the site never breaks a render.
+ * Live episode data from the podcast RSS feed (Anchor/Spotify).
+ * Always up-to-date — unlike the iTunes API which can lag by days.
+ * Revalidates every hour. Falls back to static data if unreachable.
  */
 import type { Episode } from "./types";
 import { getEpisodes as getFallbackEpisodes } from "./data";
 import { getSupabaseClient } from "@/lib/supabase/client";
 
-const ITUNES_SHOW_ID = "1830727081";
-const ITUNES_API_URL =
-  `https://itunes.apple.com/lookup?id=${ITUNES_SHOW_ID}&country=ar&media=podcast&entity=podcastEpisode&limit=100`;
-
-// ─── Raw iTunes shapes ───────────────────────────────────────────────────────
-
-interface RawEpisode {
-  wrapperType: "podcastEpisode";
-  trackId: number;
-  trackName: string;
-  releaseDate: string;
-  episodeUrl?: string;
-  artworkUrl600?: string;
-  description?: string;
-  shortDescription?: string;
-  trackTimeMillis?: number;
-  trackViewUrl?: string;
-}
-
-interface RawShow {
-  wrapperType: string;
-  trackCount?: number;
-  artworkUrl600?: string;
-}
+const RSS_FEED_URL = "https://anchor.fm/s/1004ba98c/podcast/rss";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -40,14 +15,21 @@ function toSlug(str: string): string {
   return str
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "") // strip diacritics
+    .replace(/[̀-ͯ]/g, "")
     .replace(/[^a-z0-9\s-]/g, "")
     .trim()
     .replace(/\s+/g, "-");
 }
 
-function stripHtml(str: string): string {
+function extractCDATA(str: string): string {
+  return str.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1");
+}
+
+export function stripHtml(str: string): string {
   return str
+    .replace(/<\/p>/gi, "\n")
+    .replace(/<\/li>/gi, "\n")
+    .replace(/<br\s*\/?>/gi, "\n")
     .replace(/<[^>]+>/g, "")
     .replace(/&amp;/gi, "&")
     .replace(/&lt;/gi, "<")
@@ -55,24 +37,36 @@ function stripHtml(str: string): string {
     .replace(/&quot;/gi, '"')
     .replace(/&#39;/gi, "'")
     .replace(/&nbsp;/gi, " ")
+    .replace(/\n[ \t]+/g, "\n")
+    .replace(/\n{2,}/g, "\n")
     .trim();
 }
 
-/**
- * SWAP titles follow the pattern "Tema del episodio | Nombre del Invitado".
- * We split on the last " | " to separate topic from guest name.
- */
-function parseTitle(trackName: string): { topic: string; guest: string } {
-  const idx = trackName.lastIndexOf(" | ");
+function parseTitle(title: string): { topic: string; guest: string } {
+  const idx = title.lastIndexOf(" | ");
   if (idx !== -1) {
-    const topic = trackName
-      .slice(0, idx)
-      .trim()
-      .replace(/^["'“”]|["'“”]$/g, ""); // strip surrounding quotes
-    const guest = trackName.slice(idx + 3).trim();
+    const topic = title.slice(0, idx).trim().replace(/^["'""]|["'""]$/g, "");
+    const guest = title.slice(idx + 3).trim();
     return { topic, guest };
   }
-  return { topic: trackName.trim(), guest: "" };
+  return { topic: title.trim(), guest: "" };
+}
+
+function rssTag(tag: string, xml: string): string {
+  const match = xml.match(new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tag}>`, "i"));
+  return match ? extractCDATA(match[1]).trim() : "";
+}
+
+function rssAttr(tag: string, attr: string, xml: string): string {
+  const match = xml.match(new RegExp(`<${tag}[^>]*\\s${attr}="([^"]*)"`, "i"));
+  return match?.[1] ?? "";
+}
+
+function durationToMs(duration: string): number | null {
+  const parts = duration.split(":").map(Number);
+  if (parts.length === 3) return (parts[0] * 3600 + parts[1] * 60 + parts[2]) * 1000;
+  if (parts.length === 2) return (parts[0] * 60 + parts[1]) * 1000;
+  return null;
 }
 
 // ─── Supabase episode links ───────────────────────────────────────────────────
@@ -104,59 +98,61 @@ async function getEpisodeLinks(): Promise<EpisodeLinks> {
 
 export async function getAllEpisodes(): Promise<Episode[]> {
   try {
-    const [res, links] = await Promise.all([
-      fetch(ITUNES_API_URL, { next: { revalidate: 3600 } }),
+    const [rssRes, links] = await Promise.all([
+      fetch(RSS_FEED_URL, { next: { revalidate: 3600 } }),
       getEpisodeLinks(),
     ]);
-    if (!res.ok) throw new Error(`iTunes API returned ${res.status}`);
+    if (!rssRes.ok) throw new Error(`RSS feed returned ${rssRes.status}`);
 
-    const data = await res.json();
-    const results: (RawEpisode | RawShow)[] = data.results ?? [];
+    const xml = await rssRes.text();
+    const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+    const items: string[] = [];
+    let m: RegExpExecArray | null;
+    while ((m = itemRegex.exec(xml)) !== null) items.push(m[1]);
 
-    const show = results.find(
-      (r): r is RawShow => r.wrapperType !== "podcastEpisode"
+    const episodes: Episode[] = items.map((item, idx) => {
+      const rawTitle = rssTag("title", item);
+      const { topic, guest } = parseTitle(rawTitle);
+      const slug = guest ? toSlug(guest) : `ep-${items.length - idx}`;
+
+      const rawDesc = rssTag("description", item);
+      const description = rawDesc ? stripHtml(rawDesc) : "";
+
+      const artworkUrl = rssAttr("itunes:image", "href", item);
+      const durationStr = rssTag("itunes:duration", item);
+      const epNumStr = rssTag("itunes:episode", item);
+      const epNum = parseInt(epNumStr, 10);
+      const guid = rssTag("guid", item);
+      const pubDate = rssTag("pubDate", item);
+      const audioUrl = rssAttr("enclosure", "url", item);
+
+      return {
+        id: guid || String(idx),
+        slug,
+        episodeNumber: isNaN(epNum) ? items.length - idx : epNum,
+        title: topic,
+        description,
+        guest,
+        guestBio: "",
+        youtubeUrl: links[slug]?.youtubeUrl ?? null,
+        spotifyUrl:
+          links[slug]?.spotifyUrl ??
+          "https://open.spotify.com/show/1t25iC8KdPXDZ9BUr1KgxY",
+        appleUrl: null,
+        publishedAt: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
+        thumbnailUrl: artworkUrl || null,
+        artworkUrl: artworkUrl || null,
+        audioUrl: audioUrl || null,
+        durationMs: durationStr ? durationToMs(durationStr) : null,
+        topic,
+      } satisfies Episode;
+    });
+
+    return episodes.sort(
+      (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
     );
-    const trackCount = show?.trackCount ?? 22;
-
-    const episodes: Episode[] = results
-      .filter((r): r is RawEpisode => r.wrapperType === "podcastEpisode")
-      .map((ep, idx) => {
-        const { topic, guest } = parseTitle(ep.trackName);
-        const slug = guest ? toSlug(guest) : `ep-${trackCount - idx}`;
-        const description = ep.description
-          ? stripHtml(ep.description)
-          : ep.shortDescription
-          ? stripHtml(ep.shortDescription)
-          : "";
-        return {
-          id: String(ep.trackId),
-          slug,
-          episodeNumber: trackCount - idx, // newest = highest number
-          title: topic,
-          description,
-          guest,
-          guestBio: "",
-          youtubeUrl: links[slug]?.youtubeUrl ?? null,
-          spotifyUrl:
-            links[slug]?.spotifyUrl ??
-            "https://open.spotify.com/show/1t25iC8KdPXDZ9BUr1KgxY",
-          appleUrl: ep.trackViewUrl ?? null,
-          publishedAt: ep.releaseDate,
-          thumbnailUrl: ep.artworkUrl600 ?? null,
-          artworkUrl: ep.artworkUrl600 ?? null,
-          audioUrl: ep.episodeUrl ?? null,
-          durationMs: ep.trackTimeMillis ?? null,
-          topic,
-        } satisfies Episode;
-      })
-      .sort(
-        (a, b) =>
-          new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-      );
-
-    return episodes;
   } catch (err) {
-    console.error("[feed] iTunes API failed — using static fallback:", err);
+    console.error("[feed] RSS feed failed — using static fallback:", err);
     return getFallbackEpisodes();
   }
 }
@@ -176,7 +172,6 @@ export async function getEpisodeCount(): Promise<number> {
   return episodes.length;
 }
 
-/** Returns all episodes — each SWAP episode features one guest. */
 export async function getGuests(): Promise<Episode[]> {
   return getAllEpisodes();
 }
