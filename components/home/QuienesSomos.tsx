@@ -73,18 +73,22 @@ export default function QuienesSomos() {
         className="relative w-full h-[520px] sm:h-[660px] pointer-events-none select-none overflow-hidden"
         style={{ scale: imageScale, opacity: imageOpacity }}
       >
-        <Image
-          src="/images/quienes-somos-bg.png"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover"
-          style={{
-            objectPosition: "center 10%",
-            transform: "scale(1.05) translateX(-5%) translateY(3%)",
-          }}
-          aria-hidden
-        />
+        {/* Inner wrapper carries the crop transform — keeps it off the <img> so
+            Next.js image optimization doesn't interact with scale in production */}
+        <div
+          className="absolute inset-0"
+          style={{ transform: "scale(1.05) translateX(-5%) translateY(3%)" }}
+        >
+          <Image
+            src="/images/quienes-somos-bg.png"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover"
+            style={{ objectPosition: "center 10%" }}
+            aria-hidden
+          />
+        </div>
         {/* Cinematic vignette — overlay blends cleanly at all edges */}
         <div
           className="absolute inset-0 z-10"
