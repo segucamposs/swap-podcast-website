@@ -127,7 +127,8 @@ export async function getAllEpisodes(): Promise<Episode[]> {
       const pubDate = rssTag("pubDate", item);
       const audioUrl = rssAttr("enclosure", "url", item);
 
-      const episodeLink = links[slug] ?? episodeOverrides[slug];
+      const supabaseLink = links[slug];
+      const overrideLink = episodeOverrides[slug];
 
       return {
         id: guid || String(idx),
@@ -137,9 +138,10 @@ export async function getAllEpisodes(): Promise<Episode[]> {
         description,
         guest,
         guestBio: "",
-        youtubeUrl: episodeLink?.youtubeUrl ?? null,
+        youtubeUrl: supabaseLink?.youtubeUrl ?? overrideLink?.youtubeUrl ?? null,
         spotifyUrl:
-          episodeLink?.spotifyUrl ??
+          supabaseLink?.spotifyUrl ??
+          overrideLink?.spotifyUrl ??
           "https://open.spotify.com/show/1t25iC8KdPXDZ9BUr1KgxY",
         appleUrl: null,
         publishedAt: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
