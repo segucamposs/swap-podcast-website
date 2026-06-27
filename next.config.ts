@@ -4,9 +4,14 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        // iTunes / Apple Podcasts artwork (e.g. is1-ssl.mzstatic.com)
+        // iTunes / Apple Podcasts artwork
         protocol: "https",
         hostname: "**.mzstatic.com",
+      },
+      {
+        // Anchor / Spotify podcast episode artwork (RSS feed)
+        protocol: "https",
+        hostname: "**.cloudfront.net",
       },
     ],
   },
