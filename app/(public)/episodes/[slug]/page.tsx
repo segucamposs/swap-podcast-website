@@ -29,6 +29,11 @@ function parseDescription(description: string, guestName: string): ParsedDescrip
   let bullets: string[] = [];
   let bio = "";
 
+  // Bio pattern: "FirstName LastName es [role]" — works even when nickname differs from stored name
+  const bioPattern = /^[A-ZÁÉÍÓÚÑÜ][a-záéíóúñü]+\s+[A-ZÁÉÍÓÚÑÜ][a-záéíóúñü]+\s+es\s/;
+  const firstName = guestName.split(" ")[0];
+  const isBio = (p: string) => p.startsWith(firstName) || bioPattern.test(p);
+
   if (bulletSection.includes("•") || bulletSection.includes("\n")) {
     // RSS / newer iTunes: bullets separated by newlines and/or • characters
     const parts = bulletSection
@@ -36,8 +41,7 @@ function parseDescription(description: string, guestName: string): ParsedDescrip
       .map((s) => s.replace(/^•\s*/, "").trim())
       .filter(Boolean);
 
-    const firstName = guestName.split(" ")[0];
-    const bioIndex = parts.findIndex((p) => p.startsWith(firstName));
+    const bioIndex = parts.findIndex(isBio);
     if (bioIndex !== -1) {
       bio = parts[bioIndex];
       bullets = parts.filter((_, i) => i !== bioIndex);
@@ -52,8 +56,7 @@ function parseDescription(description: string, guestName: string): ParsedDescrip
       .map((s) => s.trim())
       .filter(Boolean);
 
-    const firstName = guestName.split(" ")[0];
-    const bioIndex = parts.findIndex((p) => p.startsWith(firstName));
+    const bioIndex = parts.findIndex(isBio);
     if (bioIndex !== -1) {
       bio = parts[bioIndex];
       bullets = parts.filter((_, i) => i !== bioIndex);
