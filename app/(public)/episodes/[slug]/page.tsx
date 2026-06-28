@@ -169,12 +169,12 @@ export default async function EpisodePage({ params }: Props) {
               </h1>
 
               {/* Platform links */}
-              <div className="inline-flex items-center bg-zinc-900 rounded-full p-1.5 gap-1">
+              <div className="flex flex-wrap items-center gap-2">
                 <a
                   href={episode.spotifyUrl ?? "https://open.spotify.com/show/1t25iC8KdPXDZ9BUr1KgxY"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-white/70 hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200"
+                  className="inline-flex items-center gap-2 text-white/70 hover:text-white bg-zinc-900 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200"
                 >
                   <Image src="/icons/spotify.png" alt="" width={18} height={18} className="object-contain" />
                   Spotify
@@ -184,7 +184,7 @@ export default async function EpisodePage({ params }: Props) {
                   href={episode.youtubeUrl ?? "https://www.youtube.com/@SwapPodcast"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-white/70 hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200"
+                  className="inline-flex items-center gap-2 text-white/70 hover:text-white bg-zinc-900 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200"
                 >
                   <Image src="/icons/youtube.png" alt="" width={18} height={18} className="object-contain" />
                   YouTube
@@ -194,7 +194,7 @@ export default async function EpisodePage({ params }: Props) {
                   href={episode.appleUrl ?? "https://podcasts.apple.com/ar/podcast/swap-podcast/id1830727081"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-white/70 hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200"
+                  className="inline-flex items-center gap-2 text-white/70 hover:text-white bg-zinc-900 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200"
                 >
                   <Image src="/icons/apple-podcasts.png" alt="" width={18} height={18} className="object-contain" />
                   Apple Podcasts

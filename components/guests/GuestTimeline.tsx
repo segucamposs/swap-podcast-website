@@ -11,8 +11,10 @@ const EASE = [0.76, 0, 0.24, 1] as const;
 
 // Serpentine geometry — guests alternate sides, but each side wanders so the
 // path never feels mechanical. Values are % of the track width.
-const LEFT_XS = [18, 26, 15, 23];
-const RIGHT_XS = [82, 74, 85, 77];
+// Clamped to 20–80 % so photos stay within the container at all viewport widths
+// (at 390 px with w-32 photos, the safe range is ≈ 18–82 %; using 20–80 % for margin)
+const LEFT_XS = [22, 26, 20, 24];
+const RIGHT_XS = [78, 74, 80, 76];
 const Y_UNIT = 100; // svg units per guest row
 const BOW = 0.6; // how hard the curve swings past each node toward the edges
 
@@ -134,7 +136,7 @@ function TimelineStop({ node, topPct }: { node: Node; topPct: number }) {
             line behind it (no bleed-through at the junction). */}
         <div
           style={{ aspectRatio: meta?.aspect ?? 16 / 9 }}
-          className="relative w-40 overflow-hidden rounded-2xl border-2 border-brand-orange/70 bg-zinc-900 shadow-[0_0_0_5px_rgba(255,117,31,0.12)] transition-transform duration-500 group-hover:scale-105 sm:w-56"
+          className="relative w-32 overflow-hidden rounded-2xl border-2 border-brand-orange/70 bg-zinc-900 shadow-[0_0_0_5px_rgba(255,117,31,0.12)] transition-transform duration-500 group-hover:scale-105 sm:w-56"
         >
           {photo ? (
             <Image
@@ -259,7 +261,7 @@ export default function GuestTimeline({
       {n === 0 ? (
         <p className="py-24 text-center text-white/40">Cargando invitados…</p>
       ) : (
-        <section className="px-4 pb-28 sm:px-6" aria-label="Línea de tiempo de invitados">
+        <section className="overflow-x-hidden px-4 pb-28 sm:px-6" aria-label="Línea de tiempo de invitados">
           <div
             ref={trackRef}
             className="relative mx-auto w-full max-w-3xl"
