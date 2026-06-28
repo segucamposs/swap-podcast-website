@@ -35,7 +35,7 @@ export function CartPageClient() {
   // ─── Empty cart ────────────────────────────────────────────────────────────
   if (items.length === 0) {
     return (
-      <section className="mx-auto flex max-w-2xl flex-col items-center gap-6 px-4 py-24 text-center sm:px-6">
+      <section data-testid="empty-cart" className="mx-auto flex max-w-2xl flex-col items-center gap-6 px-4 py-24 text-center sm:px-6">
         <h1 className="font-heading text-3xl font-bold">Tu carrito está vacío</h1>
         <p className="text-white/60">Explorá la tienda y agregá algo que te guste.</p>
         <Link
@@ -133,6 +133,7 @@ export function CartPageClient() {
                   </Link>
                   <button
                     onClick={() => removeItem(item.productId)}
+                    data-testid="remove-item"
                     aria-label={`Eliminar ${item.name}`}
                     className="shrink-0 text-white/30 hover:text-red-400 transition-colors"
                   >
@@ -157,7 +158,7 @@ export function CartPageClient() {
 
           <div className="flex justify-between text-white/70">
             <span>Subtotal</span>
-            <span className="font-semibold text-white">{formatARS(totalArs)}</span>
+            <span data-testid="cart-total" className="font-semibold text-white">{formatARS(totalArs)}</span>
           </div>
 
           <hr className="border-white/10" />
@@ -170,6 +171,7 @@ export function CartPageClient() {
               </label>
               <input
                 id="buyerName"
+                data-testid="buyer-name"
                 type="text"
                 autoComplete="name"
                 value={form.buyerName}
@@ -180,7 +182,7 @@ export function CartPageClient() {
                 placeholder="Segu Campos"
               />
               {errors.buyerName && (
-                <p id="buyerName-error" role="alert" className="text-xs text-red-400">
+                <p id="buyerName-error" data-testid="field-error" role="alert" className="text-xs text-red-400">
                   {errors.buyerName}
                 </p>
               )}
@@ -192,6 +194,7 @@ export function CartPageClient() {
               </label>
               <input
                 id="buyerEmail"
+                data-testid="buyer-email"
                 type="email"
                 autoComplete="email"
                 value={form.buyerEmail}
@@ -202,7 +205,7 @@ export function CartPageClient() {
                 placeholder="vos@ejemplo.com"
               />
               {errors.buyerEmail && (
-                <p id="buyerEmail-error" role="alert" className="text-xs text-red-400">
+                <p id="buyerEmail-error" data-testid="field-error" role="alert" className="text-xs text-red-400">
                   {errors.buyerEmail}
                 </p>
               )}
@@ -216,6 +219,7 @@ export function CartPageClient() {
 
             <button
               type="submit"
+              data-testid="checkout-submit"
               disabled={loading}
               className="mt-2 flex items-center justify-center gap-2 rounded-full bg-brand-orange py-3 font-semibold text-black transition-opacity hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
             >

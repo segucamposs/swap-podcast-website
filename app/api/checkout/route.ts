@@ -126,9 +126,12 @@ export async function POST(request: Request) {
     initPoint    = mp.initPoint;
     preferenceId = mp.preferenceId;
   } catch (err) {
-    console.error("[checkout] MP preference error:", err);
+    console.error("[checkout] MP preference error (full):", JSON.stringify(err, null, 2));
     return Response.json(
-      { error: "No se pudo iniciar el pago. Intentá de nuevo." },
+      {
+        error: "No se pudo iniciar el pago. Intentá de nuevo.",
+        ...(process.env.NODE_ENV !== "production" && { detail: err }),
+      },
       { status: 502 }
     );
   }

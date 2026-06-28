@@ -34,7 +34,7 @@ export function ProductCard({ product }: ProductCardProps) {
   }
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/5 transition-colors hover:border-brand-orange/40">
+    <article data-testid="product-card" className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/5 transition-colors hover:border-brand-orange/40">
       {/* Product image */}
       <Link href={`/store/${product.slug}`} className="relative block aspect-square overflow-hidden bg-white/5">
         {product.imageUrl ? (
@@ -62,13 +62,13 @@ export function ProductCard({ product }: ProductCardProps) {
       {/* Details */}
       <div className="flex flex-1 flex-col gap-3 p-4">
         <Link href={`/store/${product.slug}`} className="font-heading text-lg font-semibold leading-tight hover:text-brand-orange transition-colors">
-          {product.name}
+          <span data-testid="product-name">{product.name}</span>
         </Link>
 
         <p className="text-sm text-white/60 line-clamp-2">{product.description}</p>
 
         <div className="mt-auto flex items-center justify-between gap-3">
-          <span className="font-heading text-xl font-bold text-brand-orange">
+          <span data-testid="product-price" className="font-heading text-xl font-bold text-brand-orange">
             {formatARS(product.priceArs)}
           </span>
 

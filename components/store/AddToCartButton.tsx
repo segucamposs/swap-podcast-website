@@ -39,6 +39,7 @@ export function AddToCartButton({ product }: AddToCartButtonProps) {
   return (
     <button
       onClick={handleAdd}
+      data-testid="add-to-cart"
       aria-live="polite"
       className="w-full rounded-full bg-brand-orange py-4 text-lg font-semibold text-black transition-opacity hover:opacity-90"
     >

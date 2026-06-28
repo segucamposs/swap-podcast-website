@@ -35,6 +35,7 @@ export async function createMPPreference({
   const preference = new Preference(config);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const isLocalhost = siteUrl.includes("localhost") || siteUrl.includes("127.0.0.1");
 
   const result = await preference.create({
     body: {
@@ -44,7 +45,7 @@ export async function createMPPreference({
         id: item.productId,
         title: item.name,
         quantity: item.quantity,
-        unit_price: item.priceArs,
+        unit_price: Number(item.priceArs),  // MP requires a JS number, not a BigInt/string
         currency_id: "ARS",
       })),
       back_urls: {
@@ -52,8 +53,11 @@ export async function createMPPreference({
         failure: `${siteUrl}/payment/failure`,
         pending: `${siteUrl}/payment/pending`,
       },
-      auto_return: "approved",
-      notification_url: `${siteUrl}/api/webhooks/mercadopago`,
+      // auto_return + notification_url require public HTTPS URLs — omit on localhost
+      ...(!isLocalhost && {
+        auto_return: "approved" as const,
+        notification_url: `${siteUrl}/api/webhooks/mercadopago`,
+      }),
     },
   });
 
