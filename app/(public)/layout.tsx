@@ -15,7 +15,7 @@ export default function PublicLayout({
       <PageTransition />
       <StickyHeader />
       <Navbar />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 flex flex-col">{children}</main>
       <Footer />
       <a
         href="https://wa.me/5492355463731"

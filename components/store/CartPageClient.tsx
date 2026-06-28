@@ -29,7 +29,7 @@ interface FormErrors {
 
 function EmptyCart() {
   return (
-    <section data-testid="empty-cart" className="mx-auto flex max-w-lg flex-col items-center gap-8 px-4 py-32 text-center">
+    <section data-testid="empty-cart" className="flex-1 mx-auto flex w-full max-w-lg flex-col items-center justify-center gap-8 px-4 py-32 text-center min-h-screen">
       <div className="flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-white/5 text-4xl">
         🛒
       </div>
@@ -166,7 +166,7 @@ export function CartPageClient() {
   }
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+    <section className="flex-1 mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8 min-h-screen">
       {/* Header */}
       <div className="mb-8 flex items-baseline gap-3">
         <h1 className="font-heading text-3xl font-bold">Tu carrito</h1>
