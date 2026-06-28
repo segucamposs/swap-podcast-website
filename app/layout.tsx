@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Poppins, Geist_Mono } from "next/font/google";
 import InitialOverlay from "@/components/providers/InitialOverlay";
+import { CartProvider } from "@/components/providers/CartProvider";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -47,7 +48,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-black text-white">
         <InitialOverlay />
-        {children}
+        <CartProvider>
+          {children}
+        </CartProvider>
       </body>
     </html>
   );

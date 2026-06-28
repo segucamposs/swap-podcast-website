@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseServiceClient } from "@/lib/supabase/service";
 
 const SPOTIFY_SHOW_ID   = "1t25iC8KdPXDZ9BUr1KgxY";
 const RSS_FEED_URL      = "https://anchor.fm/s/1004ba98c/podcast/rss";
@@ -133,12 +133,10 @@ export async function GET(req: NextRequest) {
   }
 
   // Supabase admin client (bypasses RLS for writes)
-  const supabaseUrl  = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceKey   = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !serviceKey) {
+  const supabase = getSupabaseServiceClient();
+  if (!supabase) {
     return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
   }
-  const supabase = createClient(supabaseUrl, serviceKey);
 
   // Which slugs do we already have?
   const { data: existing } = await supabase.from("episode_links").select("slug");

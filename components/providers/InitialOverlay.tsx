@@ -9,6 +9,8 @@ export default function InitialOverlay() {
   const [show, setShow] = useState(true);
 
   useEffect(() => {
+    // Unmount the overlay after first paint — sync setState is intentional.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShow(false);
   }, []);
 

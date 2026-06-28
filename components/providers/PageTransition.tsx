@@ -11,6 +11,8 @@ export default function PageTransition() {
   const [logo,    setLogo]    = useState(false);
 
   useEffect(() => {
+    // Sync state resets on route change are intentional for the transition animation.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOverlay(true);
     setLogo(false);
 

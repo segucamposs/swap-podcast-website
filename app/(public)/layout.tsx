@@ -4,6 +4,7 @@ import StickyHeader from "@/components/layout/StickyHeader";
 import LenisProvider from "@/components/providers/LenisProvider";
 import PageTransition from "@/components/providers/PageTransition";
 
+
 export default function PublicLayout({
   children,
 }: {

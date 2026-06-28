@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "**.cloudfront.net",
       },
+      {
+        // Supabase Storage — product images uploaded via admin panel
+        protocol: "https",
+        hostname: "**.supabase.co",
+      },
     ],
   },
 };

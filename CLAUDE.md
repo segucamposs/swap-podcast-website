@@ -8,8 +8,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 npm run dev      # start local server at localhost:3000
-npm run build    # production build (runs type-check + Next.js compiler)
-npm run lint     # ESLint via eslint-config-next
+npm run build    # production build (Next.js runs type-check inside the compiler)
+npm run lint     # ESLint flat config (eslint.config.mjs) — NOT next lint
 npm start        # serve the production build locally
 ```
 
@@ -21,22 +21,40 @@ No test runner is wired up yet — Playwright will be added later. CI runs `lint
 
 ### Data flow — episodes
 
-Episode data has two sources, merged under a single interface (`lib/episodes/types.ts → Episode`):
+Episode data flows through a layered pipeline, all typed by `lib/episodes/types.ts → Episode`:
 
-1. **Live** — `lib/episodes/feed.ts` fetches the iTunes/Apple Podcasts public API (no auth, no API key). All pages use this path. ISR revalidation is set to `3600` seconds so fetches are cached at the edge.
-2. **Static fallback** — `lib/episodes/data.ts` holds a handful of hardcoded episodes. `feed.ts` catches any iTunes API error and returns this list instead, so the site never breaks.
-
-The feed parses SWAP's title format `"Topic | Guest Name"` into separate `topic` and `guest` fields and derives `slug` from the guest name.
+1. **Live RSS** — `lib/episodes/feed.ts` fetches the Anchor/Spotify RSS feed (`anchor.fm/s/1004ba98c/podcast/rss`) with ISR `revalidate: 3600`. XML is parsed with regex (no xml2js or similar — hand-rolled helpers `rssTag`, `rssAttr`, `extractCDATA`). `parseTitle` handles two title formats: `"Topic | Guest"` (current) and `"Topic - Guest #N"` (early episodes). Slug is derived from the guest name via `toSlug`.
+2. **Platform link merge (3-tier)** — for each episode's Spotify/YouTube/Apple URL, `feed.ts` resolves in order of precedence:
+   - Supabase `episode_links` table (populated by the daily cron)
+   - `lib/episodes/overrides.ts` — hand-maintained static map for older episodes not yet in the DB
+   - Show-level default URL (falls back to the SWAP show page)
+3. **Guest photo layer** — `lib/episodes/guest-meta.ts` maps each guest slug to a candid photo path and aspect ratio. The `/invitados` page only shows guests present in **both** the RSS feed and this map — entries with no matching RSS slug are silently held back until the feed catches up.
+4. **Static fallback** — `lib/episodes/data.ts` (3 hardcoded episodes). `feed.ts` returns this list if the RSS fetch fails so the site never breaks.
 
 ### Route groups
 
-- `app/(public)/` — public-facing pages (home, episodes, episodes/[slug], about, contact, invitados). Shared layout adds Navbar + Footer.
-- `app/api/` — Route Handlers. Only `POST /api/newsletter` exists today.
+- `app/(public)/` — public-facing pages (home, episodes, `episodes/[slug]`, about, contact, invitados). Shared layout adds Navbar + Footer.
+- `app/api/` — Route Handlers: `POST /api/newsletter` (subscriber capture) and `GET /api/sync-episode-links` (cron-protected).
 - `app/admin/` — **not yet built.** Will be auth-protected via middleware.
+
+### Episode link sync (cron)
+
+`app/api/sync-episode-links/route.ts` runs on a **Vercel cron** (`vercel.json`) daily at 10:00 UTC. It reads new episode slugs from RSS, fetches matching Spotify URLs (Client Credentials flow) and YouTube URLs (YouTube Data API), and upserts into Supabase `episode_links` using the service-role key (bypasses RLS).
+
+Auth: Vercel sends `Authorization: Bearer <CRON_SECRET>`; manual runs pass `x-sync-secret: <CRON_SECRET>`.
 
 ### Supabase
 
-Used only for newsletter subscribers right now. `lib/supabase/client.ts` returns `null` when env vars are absent so the newsletter form degrades gracefully before Supabase is configured. The schema lives in `supabase/migrations/`.
+Two tables, both with RLS:
+
+| Table | Purpose | Migrations |
+|---|---|---|
+| `subscribers` | Newsletter sign-ups | `0001_subscribers.sql`, `0002_subscribers_add_name.sql` |
+| `episode_links` | Per-episode Spotify/YouTube URLs | `0003_episode_links.sql` |
+
+`lib/supabase/client.ts` (`getSupabaseClient()`) returns `null` when env vars are absent — all callers handle this gracefully. The schema lives in `supabase/migrations/`.
+
+`@supabase/ssr` is installed but currently unused — it will be needed when the admin auth layer (server-side sessions) is built.
 
 ### Key env vars
 
@@ -44,10 +62,15 @@ Used only for newsletter subscribers right now. `lib/supabase/client.ts` returns
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | `lib/supabase/client.ts` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `lib/supabase/client.ts` |
+| `SUPABASE_SERVICE_ROLE_KEY` | `sync-episode-links/route.ts` (bypasses RLS for writes) |
+| `CRON_SECRET` | Vercel cron auth + manual `x-sync-secret` header |
+| `SPOTIFY_CLIENT_ID` | `sync-episode-links/route.ts` (Client Credentials flow) |
+| `SPOTIFY_CLIENT_SECRET` | `sync-episode-links/route.ts` |
+| `YOUTUBE_API_KEY` | `sync-episode-links/route.ts` |
 
 ### External image domains
 
-`next.config.ts` allows `**.mzstatic.com` (iTunes artwork CDN). Add more hosts there if new image sources are introduced.
+`next.config.ts` allows `**.mzstatic.com` (Apple artwork) and `**.cloudfront.net` (Anchor/Spotify episode artwork). Image `qualities` is set to `[75, 90]` to enable the `q90` quality used on the About page hero. Add new hosts there if additional image sources are introduced.
 
 ---
 
@@ -60,18 +83,10 @@ Also the final project for **Programación Web (ITBA)**. Every build decision mu
 
 ## Branching Strategy
 
-Two permanent branches, two different purposes:
-
 | Branch | Purpose | Mercado Pago? |
 |---|---|---|
 | `main` | Real production site — what the audience sees | No |
 | `merch` | Course submission version — adds a merch store on top of `main` | Yes |
-
-**Flow:**
-1. Build the full website on `main` (everything except payments)
-2. Branch `merch` off `main` and add the merch store + Mercado Pago integration there
-3. Submit `merch` to the professor for grading
-4. After approval, `main` stays as the live production site — no merch store, no payments
 
 All Mercado Pago / checkout / webhook code lives exclusively in the `merch` branch.
 
@@ -81,59 +96,42 @@ All Mercado Pago / checkout / webhook code lives exclusively in the `merch` bran
 
 | Layer | Choice |
 |---|---|
-| Framework | Next.js 15 (App Router) |
-| Language | TypeScript |
-| Styling | Tailwind CSS |
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript strict mode |
+| Styling | Tailwind CSS v4 — CSS-first, no `tailwind.config` file; brand tokens in `app/globals.css` under `@theme` |
+| Animations | Lenis (smooth scroll) + Motion / Framer Motion v12 — wired via `components/providers/` |
 | Database | Supabase (PostgreSQL + Auth + RLS) |
 | Payments | Mercado Pago (merch branch only) |
 | Deployment | Vercel + GitHub Actions (CI/CD) |
-| Testing | Playwright (E2E) + manual DevTools |
 
 ---
 
 ## Brand Identity
 
 ### Colors
-| Role | Color | Hex |
+| Role | Tailwind token | Hex |
 |---|---|---|
-| Primary | Orange | `#ff751f` |
-| Secondary | Black | `#000000` |
-| Accent | Gray | `#a6a6a6` |
+| Primary | `brand-orange` | `#ff751f` |
+| Accent | `brand-gray` | `#a6a6a6` |
+| Background | — | `#000000` |
 
 ### Typography
-| Role | Font | Source |
+| Role | Font | CSS var |
 |---|---|---|
-| Headings | Space Grotesk | Google Fonts |
-| Body | Poppins | Google Fonts |
-| Mono / accents | Geist Mono | Vercel |
+| Headings | Space Grotesk | `--font-space-grotesk` |
+| Body | Poppins | `--font-poppins` |
+| Mono / accents | Geist Mono | `--font-geist-mono` |
 
-### Logo Files
-Located at `DB/Logo/` (to be added to the repo under `public/`):
-- `SWAP Logo.png` — main logo (light/solid backgrounds)
-- `swap-logo-transparent.png` — for dark backgrounds and overlays
-- `Logo Episodios.png` — episode variant
-
-### Visual Direction
-- Raw and minimal — authentic conversation feel, not over-produced
-- Professional without being corporate
-- Clean, typography-forward design
-- Dark backgrounds preferred (black base with orange accents)
+Fonts are loaded via `next/font` in `app/layout.tsx`. Brand colors and keyframes are declared in `app/globals.css` under `@theme`.
 
 ### Voice & Tone
-- Argentine Spanish, vos form, local expressions
-- Casual and conversational — like talking with friends
-- Peer-to-peer: hosts learn alongside listeners, never lecturing from above
-- Curious and genuine — never fake enthusiasm
-- Simple language — if a complex term appears, explain it
-
-### Content Pillars
-Health & wellness · Productivity · Personal development · Career · Entrepreneurship · AI & tech · Mindset
+Argentine Spanish, vos form, peer-to-peer. Casual and conversational — never lecturing from above. If a complex term appears, explain it.
 
 ---
 
-## Platform Links (for footer / about page)
+## Platform Links
 
-| Platform | Handle |
+| Platform | Handle / URL |
 |---|---|
 | Spotify | `https://open.spotify.com/show/1t25iC8KdPXDZ9BUr1KgxY` |
 | Apple Podcasts | `https://podcasts.apple.com/ar/podcast/swap-podcast/id1830727081` |
@@ -146,79 +144,9 @@ Health & wellness · Productivity · Personal development · Career · Entrepren
 
 ---
 
-## Required Concepts (course syllabus)
+## Current Project Structure
 
-Everything here must be demonstrably present and working in the codebase.
-
-### Git & DevOps
-- Branches, commits with meaningful messages, pull requests
-- GitHub Actions CI pipeline (lint + build on every PR)
-- Vercel deploy with preview per PR, environment variables, logs
-- Branch protection: PRs required to merge into `main`
-
-### HTML
-- Semantic elements throughout: `<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<footer>`
-- Forms with proper labels, inputs, and fieldsets
-- Accessibility: alt text, aria-labels, focus states, color contrast (WCAG basics)
-
-### CSS
-- Box model, flexbox, grid — all three used where appropriate
-- Responsive design (mobile-first)
-- Animations (at least one meaningful transition or animation)
-- CSS custom properties (variables) — via Tailwind config or custom stylesheet
-
-### JavaScript
-- Variables, arrays, objects, functions
-- DOM manipulation and event handling
-- `localStorage` usage (e.g. persist user preferences or draft state)
-- `JSON` parsing/serialization
-- `fetch` for async data (client components hitting internal API routes)
-
-### React
-- JSX, functional components, props
-- State with `useState`, side effects with `useEffect`
-- Custom hooks where logic is reusable
-- Controlled forms
-- Consuming APIs from components
-
-### Next.js
-- App Router: layouts, nested routes, route groups
-- Server Components (default) and Client Components (`"use client"` only when needed)
-- Dynamic routes (`[slug]`, `[id]`)
-- Data fetching (server-side with `async` components, client-side with `fetch`)
-- Middleware (session check for `/admin`)
-
-### Supabase
-- SQL schema design: tables, columns, data types, primary/foreign keys, relations
-- CRUD operations (create, read, update, delete)
-- Supabase Auth: sign in, sign out, session management
-- Row Level Security (RLS) policies
-
-### Authentication & Authorization
-- Login and logout flows
-- Role-based access (admin vs public)
-- Protected routes via middleware
-- Session persistence
-
-### APIs & Backend
-- Next.js Route Handlers (`/api/*`)
-- REST conventions: correct HTTP methods and status codes
-- Request validation (Zod)
-- Error handling and consistent JSON error responses
-
-### Mercado Pago *(merch branch only)*
-- Checkout preference creation
-- Payment status handling (success, failure, pending)
-- Webhook endpoint that receives and processes payment events
-
-### Testing & Quality
-- Chrome DevTools usage throughout development
-- Manual testing of all flows
-- Playwright E2E tests covering at least one critical flow
-
----
-
-## Project Structure
+What is actually built on `main` today (sections marked `# not built yet` don't exist):
 
 ```
 swap-podcast-website/
@@ -226,46 +154,49 @@ swap-podcast-website/
 │   ├── (public)/
 │   │   ├── page.tsx              # Home / landing
 │   │   ├── episodes/
-│   │   │   ├── page.tsx          # Episode catalog
+│   │   │   ├── page.tsx          # Episode catalog (ISR revalidate: 3600)
 │   │   │   └── [slug]/page.tsx   # Episode detail
 │   │   ├── about/page.tsx
-│   │   └── contact/page.tsx
-│   ├── admin/
-│   │   ├── layout.tsx            # Auth-protected layout
-│   │   ├── page.tsx              # Dashboard
-│   │   └── episodes/
-│   │       ├── page.tsx
-│   │       ├── new/page.tsx
-│   │       └── [id]/edit/page.tsx
+│   │   ├── contact/page.tsx      # Newsletter form + mailto link (no API route)
+│   │   └── invitados/page.tsx    # Guests timeline (serpentine scroll)
+│   ├── admin/                    # not built yet — auth-protected
 │   ├── api/
-│   │   ├── episodes/
-│   │   │   ├── route.ts          # GET all, POST
-│   │   │   └── [slug]/route.ts   # GET one
-│   │   ├── contact/route.ts
 │   │   ├── newsletter/route.ts
+│   │   ├── sync-episode-links/route.ts   # Vercel cron — daily platform link sync
+│   │   ├── contact/route.ts              # not built yet
 │   │   └── webhooks/
-│   │       └── mercadopago/route.ts   # merch branch only
-│   └── payment/                       # merch branch only
-│       ├── success/page.tsx
-│       ├── failure/page.tsx
-│       └── pending/page.tsx
+│   │       └── mercadopago/route.ts      # merch branch only
+│   └── payment/                          # merch branch only
 ├── components/
 │   ├── ui/                       # Reusable primitives
-│   ├── episodes/
-│   └── layout/                   # Nav, Footer
+│   ├── about/ episodes/ guests/ home/ layout/ newsletter/
+│   └── providers/                # InitialOverlay, LenisProvider, PageTransition
 ├── lib/
-│   ├── supabase/                 # Client + server helpers
-│   ├── mercadopago/              # merch branch only
+│   ├── episodes/                 # feed.ts, data.ts, types.ts, guest-meta.ts, overrides.ts
+│   ├── supabase/                 # client.ts
 │   └── validations/              # Zod schemas
-├── public/
-│   └── logo/                     # SWAP logo files
-├── .github/
-│   ├── workflows/ci.yml
-│   └── PULL_REQUEST_TEMPLATE.md
-├── tests/                        # Playwright E2E
+├── tests/                        # not built yet — Playwright E2E
 └── supabase/
     └── migrations/
 ```
+
+---
+
+## Required Concepts (course syllabus — must be demonstrably present)
+
+The following must be present and working in the final submission. The `merch` branch adds Mercado Pago on top.
+
+- **Git/DevOps:** GitHub Actions CI (lint + build), Vercel preview per PR, branch protection
+- **HTML:** Semantic elements, accessible forms, alt text, aria-labels, WCAG focus states
+- **CSS:** Flexbox + grid + box model, responsive (mobile-first), CSS custom properties, animations
+- **JavaScript:** DOM manipulation, event handling, `localStorage`, `fetch`, JSON parsing
+- **React:** `useState`, `useEffect`, custom hooks, controlled forms, API consumption
+- **Next.js:** Layouts, nested routes, route groups, Server + Client Components, dynamic routes, middleware for `/admin`
+- **Supabase:** SQL schema, CRUD, Auth (sign in/out/session), RLS policies
+- **Auth:** Login/logout, role-based access, protected routes, session persistence
+- **API/Backend:** Route Handlers, REST status codes, Zod validation, consistent error responses
+- **Mercado Pago** *(merch only)*: checkout preference, payment status pages, webhook handler
+- **Testing:** Playwright E2E covering at least one critical flow
 
 ---
 
@@ -275,5 +206,4 @@ swap-podcast-website/
 - Server Components by default; `"use client"` only when needed
 - API routes return proper HTTP status codes and JSON error messages
 - All forms validated client-side and server-side (Zod)
-- No hardcoded secrets — `.env.local` locally, Vercel env vars in prod
 - Commit messages: `type(scope): description` (e.g. `feat(episodes): add catalog page`)

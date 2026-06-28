@@ -13,7 +13,8 @@ const NAV_LINKS = [
   { href: "/episodes", label: "Episodios", num: "02" },
   { href: "/invitados", label: "Invitados", num: "03" },
   { href: "/about", label: "Nosotros", num: "04" },
-  { href: "/contact", label: "Contacto", num: "05" },
+  { href: "/store", label: "Tienda", num: "05" },
+  { href: "/contact", label: "Contacto", num: "06" },
 ];
 
 const ALL_LINKS = [
@@ -27,7 +28,7 @@ const ALL_LINKS = [
 // ─── Constants ─────────────────────────────────────────────────────────────
 
 const EASE = [0.76, 0, 0.24, 1] as const;
-const TOTAL = NAV_LINKS.length;
+const TOTAL = NAV_LINKS.length; // keep in sync with NAV_LINKS
 
 // ─── IconLink ──────────────────────────────────────────────────────────────
 
@@ -176,6 +177,9 @@ export default function Navbar() {
   }, [isOpen]);
 
   useEffect(() => {
+    // Close the overlay whenever the route changes.
+    // Sync setState in a pathname-tracking effect is the correct pattern here.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsOpen(false);
   }, [pathname]);
 
