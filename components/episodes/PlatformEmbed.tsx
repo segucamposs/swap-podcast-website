@@ -24,7 +24,7 @@ function Tab({
   return (
     <button
       onClick={onClick}
-      className={`group flex-1 flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
+      className={`group flex-1 flex items-center justify-center gap-1.5 sm:gap-2 rounded-full px-2 sm:px-4 py-2.5 text-xs sm:text-sm font-medium transition-all duration-200 ${
         active
           ? "bg-black text-white font-semibold"
           : "text-white/55 hover:text-white/80"
@@ -55,7 +55,7 @@ export default function PlatformEmbed({ latestYouTubeVideoId }: Props) {
       <div className="flex items-stretch bg-zinc-900 border border-white/[0.08] rounded-full p-1.5 mb-6 max-w-lg mx-auto">
         <Tab active={active === "spotify"} onClick={() => setActive("spotify")} label="Spotify"        src="/icons/spotify.png" />
         <Tab active={active === "youtube"} onClick={() => setActive("youtube")} label="YouTube"        src="/icons/youtube.png" />
-        <Tab active={active === "apple"}   onClick={() => setActive("apple")}   label="Apple Podcasts" src="/icons/apple-podcasts.png" />
+        <Tab active={active === "apple"}   onClick={() => setActive("apple")}   label="Apple"          src="/icons/apple-podcasts.png" />
       </div>
 
       {/* Embeds — only mount the active one */}

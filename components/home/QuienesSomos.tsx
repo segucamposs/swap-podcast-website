@@ -70,14 +70,14 @@ export default function QuienesSomos() {
     >
       {/* ── Photo — top, full width ───────── */}
       <motion.div
-        className="relative w-full h-[600px] sm:h-[740px] pointer-events-none select-none overflow-hidden"
+        className="relative w-full h-[460px] sm:h-[740px] pointer-events-none select-none overflow-hidden"
         style={{ scale: imageScale, opacity: imageOpacity }}
       >
         {/* Inner wrapper carries the crop transform — keeps it off the <img> so
             Next.js image optimization doesn't interact with scale in production */}
         <div
           className="absolute inset-0"
-          style={{ transform: "scale(1.05) translateX(0%) translateY(3%)" }}
+          style={{ transform: "scale(1.02) translateX(0%) translateY(1%)" }}
         >
           <Image
             src="/images/quienes-somos-bg.webp"
@@ -86,7 +86,7 @@ export default function QuienesSomos() {
             sizes="100vw"
             quality={90}
             className="object-cover"
-            style={{ objectPosition: "center 10%" }}
+            style={{ objectPosition: "53% 10%" }}
             aria-hidden
           />
         </div>

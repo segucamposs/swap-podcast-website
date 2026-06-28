@@ -147,7 +147,7 @@ export default function AboutContent() {
               sizes="100vw"
               quality={90}
               className="object-cover"
-              style={{ objectPosition: "center 25%" }}
+              style={{ objectPosition: "52% 25%" }}
               priority
             />
             {/* Edge fades — top + both sides + soft bottom, blends into black */}

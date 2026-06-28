@@ -131,7 +131,7 @@ export default function HeroSection({ episodeCount }: { episodeCount: number }) 
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-screen flex items-center justify-center bg-black px-4 py-24 overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center bg-black px-4 pt-16 pb-48 sm:py-24 overflow-hidden"
       aria-label="Hero"
     >
       <motion.div
@@ -157,8 +157,8 @@ export default function HeroSection({ episodeCount }: { episodeCount: number }) 
       >
         <HeroLogo />
 
-        <div className="max-w-3xl mx-auto mt-10">
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="max-w-3xl mx-auto mt-6">
+          <div className="flex flex-col items-center sm:flex-row gap-4 justify-center">
             <EpisodesBadgeButton episodeCount={episodeCount} />
             <QuienesSomosButton />
           </div>
