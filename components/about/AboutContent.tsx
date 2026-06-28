@@ -220,7 +220,7 @@ export default function AboutContent() {
             <p className="text-white/60 text-lg leading-relaxed mb-12">
               SWAP nació de una idea simple: preguntarles a las personas que
               admiramos todo lo que siempre quisimos saber. No somos expertos
-              bajando línea desde un pedestal — somos dos pibes con muchas preguntas,
+              bajando línea desde un pedestal — somos dos amigos con muchas preguntas,
               aprendiendo junto a vos. Hablamos de todo lo que suma:
               salud, productividad, carrera, dinero, tecnología y cómo funciona la
               mente. Si te sirve para vivir un poco mejor, es tema.
