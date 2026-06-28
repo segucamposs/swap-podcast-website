@@ -166,7 +166,7 @@ export function CartPageClient() {
   }
 
   return (
-    <section className="flex-1 mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8 min-h-screen">
+    <section className="flex-1 mx-auto w-full max-w-6xl px-4 pt-24 pb-16 sm:px-6 lg:px-8 min-h-screen">
       {/* Header */}
       <div className="mb-8 flex items-baseline gap-3">
         <h1 className="font-heading text-3xl font-bold">Tu carrito</h1>
@@ -188,7 +188,7 @@ export function CartPageClient() {
 
           <Link
             href="/store"
-            className="mt-2 flex items-center gap-2 self-start text-sm text-white/40 transition-colors hover:text-white/70"
+            className="mt-4 inline-flex items-center gap-2 self-start rounded-full border border-white/20 px-5 py-2 text-sm font-medium text-white/70 transition-all hover:border-brand-orange hover:text-brand-orange"
           >
             ← Seguir comprando
           </Link>

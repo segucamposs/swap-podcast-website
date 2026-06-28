@@ -38,8 +38,8 @@ export default async function ProductDetailPage({ params }: Props) {
   if (!product) notFound();
 
   return (
-    <section className="flex-1 mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 lg:px-8 min-h-screen">
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+    <section className="flex-1 w-full min-h-screen flex flex-col justify-center px-4 sm:px-6 lg:px-8 py-24">
+      <div className="mx-auto w-full max-w-5xl grid grid-cols-1 gap-10 lg:grid-cols-2">
         {/* Image */}
         <div className="relative aspect-square overflow-hidden rounded-2xl bg-white/5">
           {product.imageUrl ? (
