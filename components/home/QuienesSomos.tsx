@@ -120,7 +120,7 @@ export default function QuienesSomos() {
         {/* Headline */}
         <h2 className="text-4xl sm:text-5xl font-black mb-7">
           <MaskLine delay={0.3} inView={inView}>
-            Dos pibes que tienen
+            Dos amigos que tienen
           </MaskLine>
           <MaskLine delay={0.48} inView={inView} className="text-brand-orange">
             muchas preguntas.
