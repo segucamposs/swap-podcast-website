@@ -5,7 +5,6 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CartIcon } from "@/components/store/CartIcon";
 
 const EASE = [0.76, 0, 0.24, 1] as const;
 
@@ -71,9 +70,7 @@ export default function StickyHeader() {
           />
         </Link>
 
-        <div className="ml-auto mr-14 sm:mr-16">
-          <CartIcon />
-        </div>
+
       </header>
 
       {/* Gradient fade — separate element so backdrop-blur stays crisp */}

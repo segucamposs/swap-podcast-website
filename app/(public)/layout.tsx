@@ -3,6 +3,7 @@ import Footer from "@/components/layout/Footer";
 import StickyHeader from "@/components/layout/StickyHeader";
 import LenisProvider from "@/components/providers/LenisProvider";
 import PageTransition from "@/components/providers/PageTransition";
+import { CartIcon } from "@/components/store/CartIcon";
 
 
 export default function PublicLayout({
@@ -17,6 +18,7 @@ export default function PublicLayout({
       <Navbar />
       <main className="flex-1 flex flex-col">{children}</main>
       <Footer />
+      <CartIcon />
       <a
         href="https://wa.me/5492355463731"
         target="_blank"
