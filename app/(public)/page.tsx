@@ -91,7 +91,7 @@ export default async function HomePage() {
       {/* ── Seguinos ───────────────────────────────────────────────── */}
       <section className="bg-zinc-950 border-y border-white/5 py-16 px-4" aria-label="Redes sociales">
         <div className="max-w-xl mx-auto text-center">
-          <h2 className="text-xl font-bold text-white mb-2">No te perdás nada</h2>
+          <h2 className="text-xl font-bold text-white mb-2">No te pierdas nada</h2>
           <p className="text-white/35 text-sm mb-8">
             Seguinos donde preferís escuchar.
           </p>
