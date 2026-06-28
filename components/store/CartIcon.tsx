@@ -1,10 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCart } from "@/components/providers/CartProvider";
 
 export function CartIcon() {
   const { totalItems } = useCart();
+  const pathname = usePathname();
+
+  if (!pathname.startsWith("/store")) return null;
 
   return (
     <Link
