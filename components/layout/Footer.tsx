@@ -101,6 +101,10 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="mt-10 pt-8 border-t border-white/5 text-xs text-white/20">
           <span>© {year} SWAP Podcast. Todos los derechos reservados.</span>
+          <span className="mx-2">·</span>
+          <Link href="/redes" className="hover:text-white/40 transition-colors duration-200">
+            Redes
+          </Link>
         </div>
       </div>
     </footer>
