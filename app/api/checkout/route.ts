@@ -102,6 +102,7 @@ export async function POST(request: Request) {
     order_id:       orderId,
     product_id:     item.productId,
     product_name:   item.name,
+    size:           item.size ?? null,
     quantity:       item.quantity,
     unit_price_ars: item.priceArs,
   }));

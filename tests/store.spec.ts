@@ -27,16 +27,15 @@ test.describe("Store — product catalog", () => {
 test.describe("Store — product detail", () => {
   test("navigates to product detail page", async ({ page }) => {
     await page.goto("/store");
-    // Click the product name link (not the article wrapper)
-    await page.locator("[data-testid='product-card']").first().locator("a").first().click();
-    // Should land on /store/[slug]
+    // The whole card is now a <Link> — click it directly
+    await page.locator("[data-testid='product-card']").first().click();
     await expect(page).toHaveURL(/\/store\/.+/, { timeout: 8_000 });
     await expect(page.locator("h1")).not.toBeEmpty();
   });
 
   test("add-to-cart button is present on detail page", async ({ page }) => {
     await page.goto("/store");
-    await page.locator("[data-testid='product-card']").first().locator("a").first().click();
+    await page.locator("[data-testid='product-card']").first().click();
     await expect(page.locator("[data-testid='add-to-cart']")).toBeVisible();
   });
 });
@@ -45,9 +44,13 @@ test.describe("Cart — add items and review", () => {
   test("adds a product to the cart", async ({ page }) => {
     await page.goto("/store");
     await page.locator("[data-testid='product-card']").first().click();
+
+    // Select size if picker is present
+    const sizePicker = page.locator("button[class*='min-w-']").first();
+    if (await sizePicker.isVisible()) await sizePicker.click();
+
     await page.locator("[data-testid='add-to-cart']").click();
 
-    // Cart icon count badge should become visible
     const badge = page.locator("[data-testid='cart-count']");
     await expect(badge).toBeVisible({ timeout: 5_000 });
     await expect(badge).toContainText("1");
@@ -56,21 +59,27 @@ test.describe("Cart — add items and review", () => {
   test("cart page shows the added item", async ({ page }) => {
     await page.goto("/store");
 
-    // Capture name from card, then add via quick-add button on the card
+    // Capture name from first card then navigate to its detail page
     const firstCard = page.locator("[data-testid='product-card']").first();
     const productName = await firstCard.locator("[data-testid='product-name']").textContent();
+    await firstCard.click();
 
-    // Use the "Agregar" quick-add button on the card (last button inside card)
-    await firstCard.locator("button").last().click();
+    // If a size picker exists, select the first size before adding
+    const sizePicker = page.locator("button[class*='min-w-']").first();
+    if (await sizePicker.isVisible()) await sizePicker.click();
 
-    // Navigate to cart
+    await page.locator("[data-testid='add-to-cart']").click();
+
     await page.goto("/store/cart");
-    await expect(page.getByText(productName!.trim())).toBeVisible();
+    // Name appears in both the item row and the summary — .first() avoids strict-mode error
+    await expect(page.getByText(productName!.trim()).first()).toBeVisible();
   });
 
   test("cart total reflects item price", async ({ page }) => {
     await page.goto("/store");
     await page.locator("[data-testid='product-card']").first().click();
+    const sizePicker = page.locator("button[class*='min-w-']").first();
+    if (await sizePicker.isVisible()) await sizePicker.click();
     await page.locator("[data-testid='add-to-cart']").click();
     await page.goto("/store/cart");
 
@@ -80,6 +89,8 @@ test.describe("Cart — add items and review", () => {
   test("removing an item empties the cart", async ({ page }) => {
     await page.goto("/store");
     await page.locator("[data-testid='product-card']").first().click();
+    const sizePicker = page.locator("button[class*='min-w-']").first();
+    if (await sizePicker.isVisible()) await sizePicker.click();
     await page.locator("[data-testid='add-to-cart']").click();
     await page.goto("/store/cart");
 
@@ -92,6 +103,8 @@ test.describe("Checkout — form validation and submission", () => {
   async function addProductAndGoToCart(page: import("@playwright/test").Page) {
     await page.goto("/store");
     await page.locator("[data-testid='product-card']").first().click();
+    const sizePicker = page.locator("button[class*='min-w-']").first();
+    if (await sizePicker.isVisible()) await sizePicker.click();
     await page.locator("[data-testid='add-to-cart']").click();
     await page.goto("/store/cart");
   }

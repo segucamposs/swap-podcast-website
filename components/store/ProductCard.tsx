@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCart } from "@/components/providers/CartProvider";
 import type { Product } from "@/lib/store/types";
 
 function formatARS(amount: number) {
@@ -13,30 +12,17 @@ function formatARS(amount: number) {
   }).format(amount);
 }
 
-interface ProductCardProps {
-  product: Product;
-}
-
-export function ProductCard({ product }: ProductCardProps) {
-  const { addItem } = useCart();
-
+export function ProductCard({ product }: { product: Product }) {
   const outOfStock = product.stock === 0;
 
-  function handleAdd() {
-    if (outOfStock) return;
-    addItem({
-      productId: product.id,
-      slug:      product.slug,
-      name:      product.name,
-      priceArs:  product.priceArs,
-      imageUrl:  product.imageUrl,
-    });
-  }
-
   return (
-    <article data-testid="product-card" className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/5 transition-colors hover:border-brand-orange/40">
-      {/* Product image */}
-      <Link href={`/store/${product.slug}`} className="relative block aspect-square overflow-hidden bg-white/5">
+    <Link
+      href={`/store/${product.slug}`}
+      data-testid="product-card"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/5 transition-all duration-300 hover:border-brand-orange/50 hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(255,117,31,0.12)]"
+    >
+      {/* Image */}
+      <div className="relative aspect-square overflow-hidden bg-white/5">
         {product.imageUrl ? (
           <Image
             src={product.imageUrl}
@@ -47,7 +33,7 @@ export function ProductCard({ product }: ProductCardProps) {
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <span className="text-5xl opacity-30">👕</span>
+            <span className="text-5xl opacity-20">👕</span>
           </div>
         )}
         {outOfStock && (
@@ -57,31 +43,30 @@ export function ProductCard({ product }: ProductCardProps) {
             </span>
           </div>
         )}
-      </Link>
+      </div>
 
       {/* Details */}
       <div className="flex flex-1 flex-col gap-3 p-4">
-        <Link href={`/store/${product.slug}`} className="font-heading text-lg font-semibold leading-tight hover:text-brand-orange transition-colors">
-          <span data-testid="product-name">{product.name}</span>
-        </Link>
+        <div className="flex flex-col gap-1">
+          <span data-testid="product-name" className="font-heading text-base font-semibold leading-tight group-hover:text-brand-orange transition-colors">
+            {product.name}
+          </span>
+          {product.sizes && product.sizes.length > 0 && (
+            <span className="text-xs text-white/40">
+              {product.sizes.join(" · ")}
+            </span>
+          )}
+        </div>
 
-        <p className="text-sm text-white/60 line-clamp-2">{product.description}</p>
-
-        <div className="mt-auto flex items-center justify-between gap-3">
-          <span data-testid="product-price" className="font-heading text-xl font-bold text-brand-orange">
+        <div className="mt-auto flex items-center justify-between gap-2">
+          <span data-testid="product-price" className="font-heading text-lg font-bold text-brand-orange">
             {formatARS(product.priceArs)}
           </span>
-
-          <button
-            onClick={handleAdd}
-            disabled={outOfStock}
-            aria-label={`Agregar ${product.name} al carrito`}
-            className="rounded-full bg-brand-orange px-4 py-2 text-sm font-semibold text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {outOfStock ? "Sin stock" : "Agregar"}
-          </button>
+          <span className="rounded-full border border-white/20 px-3 py-1 text-xs font-medium text-white/60 transition-colors group-hover:border-brand-orange/50 group-hover:text-brand-orange">
+            Ver →
+          </span>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }

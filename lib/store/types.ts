@@ -8,6 +8,7 @@ export interface Product {
   imageUrl: string | null;
   stock: number;
   active: boolean;
+  sizes: string[] | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -32,6 +33,7 @@ export interface OrderItem {
   orderId: string;
   productId: string;
   productName: string;
+  size: string | null;
   quantity: number;
   unitPriceArs: number;
   createdAt: string;
@@ -44,5 +46,6 @@ export interface CartItem {
   name: string;
   priceArs: number;
   imageUrl: string | null;
+  size: string | null;
   quantity: number;
 }

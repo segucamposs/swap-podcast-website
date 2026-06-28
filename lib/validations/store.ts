@@ -8,6 +8,7 @@ export const cartItemSchema = z.object({
   name:      z.string().min(1),
   priceArs:  z.number().int().positive("El precio debe ser positivo."),
   imageUrl:  z.string().url().nullable(),
+  size:      z.string().nullable(),
   quantity:  z.number().int().min(1, "La cantidad mínima es 1.").max(10, "Máximo 10 unidades por producto."),
 });
 

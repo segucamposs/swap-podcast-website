@@ -10,6 +10,7 @@ type RawProduct = {
   image_url: string | null;
   stock: number;
   active: boolean;
+  sizes: string[] | null;
   created_at: string;
   updated_at: string;
 };
@@ -24,6 +25,7 @@ function toProduct(raw: RawProduct): Product {
     imageUrl: raw.image_url ?? null,
     stock: raw.stock,
     active: raw.active,
+    sizes: raw.sizes ?? null,
     createdAt: raw.created_at,
     updatedAt: raw.updated_at,
   } satisfies Product;
