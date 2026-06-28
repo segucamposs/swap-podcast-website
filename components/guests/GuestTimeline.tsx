@@ -323,9 +323,10 @@ export default function GuestTimeline({
             ¿Querés ser el próximo?
           </h2>
           <p className="mb-8 text-lg leading-relaxed text-white/55">
-            Si tenés algo valioso para compartir con jóvenes de 16 a 25 años, nos
-            encantaría sumarte a la línea de tiempo. Sin currículo perfecto — solo
-            algo real para decir.
+            No te hace falta un currículo ni ser referente de nada. Somos dos
+            pibes con muchas preguntas — si sentís que tenés algo real para
+            contar, algo que aprendiste o que estás viviendo, eso alcanza.
+            Queremos aprender de vos.
           </p>
           <Link
             href="/contact"
