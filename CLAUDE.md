@@ -11,9 +11,11 @@ npm run dev      # start local server at localhost:3000
 npm run build    # production build (Next.js runs type-check inside the compiler)
 npm run lint     # ESLint flat config (eslint.config.mjs) — NOT next lint
 npm start        # serve the production build locally
+npm test         # Playwright E2E tests (auto-starts dev server)
+npm run test:ui  # Playwright in interactive UI mode
 ```
 
-No test runner is wired up yet — Playwright will be added later. CI runs `lint` then `build` on every push/PR to `main`.
+CI runs `lint` then `build` on every push/PR to `main`. Playwright config is in `playwright.config.ts` — tests live in `tests/`.
 
 ---
 
@@ -33,9 +35,17 @@ Episode data flows through a layered pipeline, all typed by `lib/episodes/types.
 
 ### Route groups
 
-- `app/(public)/` — public-facing pages (home, episodes, `episodes/[slug]`, about, contact, invitados). Shared layout adds Navbar + Footer.
-- `app/api/` — Route Handlers: `POST /api/newsletter` (subscriber capture) and `GET /api/sync-episode-links` (cron-protected).
-- `app/admin/` — **not yet built.** Will be auth-protected via middleware.
+- `app/(public)/` — public-facing pages (home, episodes, `episodes/[slug]`, about, contact, invitados, store, `store/[slug]`, `store/cart`). Shared layout adds Navbar + Footer.
+- `app/api/` — Route Handlers:
+  - `POST /api/newsletter` — subscriber capture
+  - `GET /api/sync-episode-links` — cron-protected platform link sync
+  - `POST /api/checkout` — creates MP preference + order in Supabase; re-fetches prices from DB (never trusts client amounts)
+  - `GET/POST /api/admin/products` — product CRUD (service-role; requires admin session)
+  - `PATCH/DELETE /api/admin/products/[id]` — update/delete single product
+  - `GET /api/admin/orders` — order listing for admin
+  - `POST /api/webhooks/mercadopago` — payment status updates from MP (merch branch only)
+- `app/admin/` — auth-protected dashboard (login, products, orders). Uses `@supabase/ssr` cookie sessions.
+- `app/payment/` — success / failure / pending pages after MP redirect (merch branch only).
 
 ### Episode link sync (cron)
 
@@ -45,28 +55,64 @@ Auth: Vercel sends `Authorization: Bearer <CRON_SECRET>`; manual runs pass `x-sy
 
 ### Supabase
 
-Two tables, both with RLS:
+Tables (all with RLS), migrations in `supabase/migrations/`:
 
-| Table | Purpose | Migrations |
+| Table | Purpose | Migration |
 |---|---|---|
-| `subscribers` | Newsletter sign-ups | `0001_subscribers.sql`, `0002_subscribers_add_name.sql` |
-| `episode_links` | Per-episode Spotify/YouTube URLs | `0003_episode_links.sql` |
+| `subscribers` | Newsletter sign-ups | `0001`, `0002` |
+| `episode_links` | Per-episode Spotify/YouTube URLs | `0003` |
+| `products` | Merch catalog | `0004` |
+| `orders` + `order_items` | Purchase history | `0005` |
+| `decrement_stock` | RPC for atomic stock reduction | `0006` |
+| product sizes column | `sizes text[]` added to products | `0007` |
 
-`lib/supabase/client.ts` (`getSupabaseClient()`) returns `null` when env vars are absent — all callers handle this gracefully. The schema lives in `supabase/migrations/`.
+**Three Supabase clients** in `lib/supabase/`:
 
-`@supabase/ssr` is installed but currently unused — it will be needed when the admin auth layer (server-side sessions) is built.
+| File | Client type | Used in |
+|---|---|---|
+| `client.ts` | Anon key, `createClient` | Public API routes (`newsletter`) |
+| `server.ts` | Anon key, `createServerClient` (cookie-based via `@supabase/ssr`) | Admin Server Components + middleware session check |
+| `service.ts` | Service-role key, bypasses RLS | Admin API routes that write data |
+
+All three return `null` when env vars are absent so callers fail gracefully.
 
 ### Key env vars
 
 | Var | Where used |
 |---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | `lib/supabase/client.ts` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `lib/supabase/client.ts` |
-| `SUPABASE_SERVICE_ROLE_KEY` | `sync-episode-links/route.ts` (bypasses RLS for writes) |
+| `NEXT_PUBLIC_SUPABASE_URL` | All three Supabase clients |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `client.ts`, `server.ts` |
+| `SUPABASE_SERVICE_ROLE_KEY` | `service.ts` — admin writes + cron |
 | `CRON_SECRET` | Vercel cron auth + manual `x-sync-secret` header |
-| `SPOTIFY_CLIENT_ID` | `sync-episode-links/route.ts` (Client Credentials flow) |
+| `SPOTIFY_CLIENT_ID` | `sync-episode-links/route.ts` |
 | `SPOTIFY_CLIENT_SECRET` | `sync-episode-links/route.ts` |
 | `YOUTUBE_API_KEY` | `sync-episode-links/route.ts` |
+| `MP_ACCESS_TOKEN` | `lib/mercadopago/client.ts` — preference creation + webhook verification |
+| `ADMIN_EMAILS` | `proxy.ts` — comma-separated allowlist for `/admin` access |
+
+### Admin auth middleware
+
+`proxy.ts` at the project root implements the `/admin/*` route guard using `@supabase/ssr`. It reads the Supabase session cookie, verifies the user's email against the `ADMIN_EMAILS` env var (comma-separated), and redirects unauthenticated or unauthorized requests to `/admin/login`.
+
+**Note:** Next.js middleware must be at `middleware.ts` — `proxy.ts` is currently not auto-loaded by the framework. It needs to be renamed or re-exported from `middleware.ts` to take effect in production.
+
+### Merch store flow (merch branch)
+
+```
+/store          → product listing (fetched from Supabase via lib/store/products.ts)
+/store/[slug]   → product detail + add-to-cart
+/store/cart     → cart review + checkout form (CartContext in localStorage)
+POST /api/checkout  → validates cart, recomputes prices from DB, creates order row,
+                      calls lib/mercadopago/client.ts → returns MP init_point URL
+/payment/success|failure|pending  → post-redirect status pages
+POST /api/webhooks/mercadopago    → updates order status from MP notification
+```
+
+Cart state is persisted in `localStorage` via a React context in `components/providers/`. Admin product/order management lives under `/admin/products` and `/admin/orders`.
+
+Scripts in `scripts/`:
+- `seed-products.mjs` — seed the `products` table for local dev
+- `migrate-sizes.mjs` — one-time migration to add the `sizes` column
 
 ### External image domains
 
@@ -146,38 +192,46 @@ Argentine Spanish, vos form, peer-to-peer. Casual and conversational — never l
 
 ## Current Project Structure
 
-What is actually built on `main` today (sections marked `# not built yet` don't exist):
+`main` branch has the public podcast site. `merch` branch adds the store, admin, and payment layers on top.
 
 ```
 swap-podcast-website/
+├── proxy.ts                      # Admin middleware (needs rename → middleware.ts to activate)
 ├── app/
 │   ├── (public)/
 │   │   ├── page.tsx              # Home / landing
-│   │   ├── episodes/
-│   │   │   ├── page.tsx          # Episode catalog (ISR revalidate: 3600)
-│   │   │   └── [slug]/page.tsx   # Episode detail
+│   │   ├── episodes/[slug]/      # Episode catalog + detail (ISR revalidate: 3600)
 │   │   ├── about/page.tsx
-│   │   ├── contact/page.tsx      # Newsletter form + mailto link (no API route)
-│   │   └── invitados/page.tsx    # Guests timeline (serpentine scroll)
-│   ├── admin/                    # not built yet — auth-protected
+│   │   ├── contact/page.tsx
+│   │   ├── invitados/page.tsx    # Guests timeline (serpentine scroll)
+│   │   └── store/                # merch branch: listing, [slug], cart
+│   ├── admin/                    # merch branch: layout, login, products, orders
 │   ├── api/
 │   │   ├── newsletter/route.ts
 │   │   ├── sync-episode-links/route.ts   # Vercel cron — daily platform link sync
-│   │   ├── contact/route.ts              # not built yet
-│   │   └── webhooks/
-│   │       └── mercadopago/route.ts      # merch branch only
-│   └── payment/                          # merch branch only
+│   │   ├── checkout/route.ts             # merch branch
+│   │   ├── admin/products/               # merch branch: GET/POST + [id] PATCH/DELETE
+│   │   ├── admin/orders/                 # merch branch: GET
+│   │   └── webhooks/mercadopago/         # merch branch
+│   └── payment/                          # merch branch: success/failure/pending
 ├── components/
 │   ├── ui/                       # Reusable primitives
-│   ├── about/ episodes/ guests/ home/ layout/ newsletter/
-│   └── providers/                # InitialOverlay, LenisProvider, PageTransition
+│   ├── admin/                    # AdminShell, AdminLoginForm, product/order clients
+│   ├── store/                    # merch branch: product cards, cart, checkout form
+│   └── providers/                # InitialOverlay, LenisProvider, PageTransition, CartContext
 ├── lib/
 │   ├── episodes/                 # feed.ts, data.ts, types.ts, guest-meta.ts, overrides.ts
-│   ├── supabase/                 # client.ts
-│   └── validations/              # Zod schemas
-├── tests/                        # not built yet — Playwright E2E
+│   ├── supabase/                 # client.ts, server.ts, service.ts
+│   ├── store/                    # products.ts (DB fetching), types.ts (Product, Order, CartItem)
+│   ├── mercadopago/              # client.ts — getMPConfig, createMPPreference
+│   └── validations/              # Zod schemas (store, newsletter)
+├── scripts/
+│   ├── seed-products.mjs         # Seed products table for local dev
+│   └── migrate-sizes.mjs         # One-time migration for sizes column
+├── tests/
+│   └── store.spec.ts             # Playwright E2E: catalog, cart, checkout, admin auth
 └── supabase/
-    └── migrations/
+    └── migrations/               # 0001–0007
 ```
 
 ---
@@ -191,12 +245,12 @@ The following must be present and working in the final submission. The `merch` b
 - **CSS:** Flexbox + grid + box model, responsive (mobile-first), CSS custom properties, animations
 - **JavaScript:** DOM manipulation, event handling, `localStorage`, `fetch`, JSON parsing
 - **React:** `useState`, `useEffect`, custom hooks, controlled forms, API consumption
-- **Next.js:** Layouts, nested routes, route groups, Server + Client Components, dynamic routes, middleware for `/admin`
+- **Next.js:** Layouts, nested routes, route groups, Server + Client Components, dynamic routes, middleware for `/admin` (via `proxy.ts` → needs `middleware.ts`)
 - **Supabase:** SQL schema, CRUD, Auth (sign in/out/session), RLS policies
-- **Auth:** Login/logout, role-based access, protected routes, session persistence
+- **Auth:** Login/logout via Supabase Auth + `@supabase/ssr`, role-based access via `ADMIN_EMAILS` allowlist, protected routes, session persistence via cookies
 - **API/Backend:** Route Handlers, REST status codes, Zod validation, consistent error responses
 - **Mercado Pago** *(merch only)*: checkout preference, payment status pages, webhook handler
-- **Testing:** Playwright E2E covering at least one critical flow
+- **Testing:** Playwright E2E in `tests/store.spec.ts` — covers catalog, cart, checkout validation, admin redirect
 
 ---
 
