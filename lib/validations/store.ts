@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PRODUCT_CATEGORIES } from "@/lib/store/types";
 
 // ─── Cart item ────────────────────────────────────────────────────────────────
 
@@ -36,6 +37,7 @@ export const productSchema = z.object({
   imageUrl:    z.string().url("URL de imagen inválida.").nullable().default(null),
   stock:       z.number().int().min(0, "El stock no puede ser negativo.").default(0),
   active:      z.boolean().default(true),
+  category:    z.enum(PRODUCT_CATEGORIES).default("Accesorios"),
 });
 
 export type ProductInput = z.infer<typeof productSchema>;

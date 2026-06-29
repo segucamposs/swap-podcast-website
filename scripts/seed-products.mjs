@@ -33,6 +33,7 @@ const products = [
       "Buzo con capucha premium. Tela 100% algodón pesado, bolsillo canguro y logo SWAP bordado en el pecho. Negro.",
     price_ars: 38000,
     stock: 20,
+    category: "Buzos",
     file: "swap-hoodie.png",
   },
   {
@@ -42,6 +43,7 @@ const products = [
       "Buzo cuello redondo clásico. Algodón 320gsm, logo SWAP en el pecho. Perfecto para el día a día.",
     price_ars: 29000,
     stock: 15,
+    category: "Buzos",
     file: "swap-crewneck.png",
   },
   {
@@ -51,6 +53,7 @@ const products = [
       "Remera oversize 100% algodón. Logo SWAP en naranja sobre negro. Talle único amplio.",
     price_ars: 18000,
     stock: 30,
+    category: "Remeras",
     file: "swap-tee-negra.png",
   },
   {
@@ -60,6 +63,7 @@ const products = [
       "Gorra 5 paneles con logo SWAP bordado. Cierre ajustable. Negra.",
     price_ars: 14000,
     stock: 25,
+    category: "Accesorios",
     file: "swap-gorra.png",
   },
   {
@@ -69,6 +73,7 @@ const products = [
       "Pack de 4 stickers troquelados con diseños exclusivos de SWAP Podcast. Vinilo resistente al agua.",
     price_ars: 3500,
     stock: 100,
+    category: "Stickers",
     file: "swap-stickers.png",
   },
 ];
@@ -113,6 +118,7 @@ async function main() {
         price_ars: product.price_ars,
         image_url,
         stock: product.stock,
+        category: product.category,
         active: true,
       },
       { onConflict: "slug" }

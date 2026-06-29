@@ -9,9 +9,13 @@ export interface Product {
   stock: number;
   active: boolean;
   sizes: string[] | null;
+  category: string;
   createdAt: string;
   updatedAt: string;
 }
+
+export const PRODUCT_CATEGORIES = ["Remeras", "Buzos", "Accesorios", "Stickers"] as const;
+export type ProductCategory = (typeof PRODUCT_CATEGORIES)[number];
 
 /** A row in `orders`. */
 export interface Order {

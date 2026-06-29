@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { slug, name, description, priceArs, imageUrl, stock, active } = result.data;
+  const { slug, name, description, priceArs, imageUrl, stock, active, category } = result.data;
 
   const supabase = getSupabaseServiceClient();
   if (!supabase) return Response.json({ error: "Service unavailable" }, { status: 503 });
@@ -72,6 +72,7 @@ export async function POST(request: Request) {
       image_url:  imageUrl,
       stock,
       active,
+      category,
     })
     .select("*")
     .single();

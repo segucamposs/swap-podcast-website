@@ -40,14 +40,14 @@ export async function PUT(request: Request, { params }: Params) {
     );
   }
 
-  const { slug, name, description, priceArs, imageUrl, stock, active } = result.data;
+  const { slug, name, description, priceArs, imageUrl, stock, active, category } = result.data;
 
   const supabase = getSupabaseServiceClient();
   if (!supabase) return Response.json({ error: "Service unavailable" }, { status: 503 });
 
   const { data, error } = await supabase
     .from("products")
-    .update({ slug, name, description, price_ars: priceArs, image_url: imageUrl, stock, active })
+    .update({ slug, name, description, price_ars: priceArs, image_url: imageUrl, stock, active, category })
     .eq("id", id)
     .select("*")
     .single();

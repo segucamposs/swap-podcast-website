@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PRODUCT_CATEGORIES } from "@/lib/store/types";
 import type { Product } from "@/lib/store/types";
 
 interface ProductFormProps {
@@ -18,6 +19,7 @@ export interface ProductFormData {
   imageUrl: string | null;
   stock: number;
   active: boolean;
+  category: string;
 }
 
 export function ProductForm({ initial = {}, onSave, onCancel, loading }: ProductFormProps) {
@@ -29,6 +31,7 @@ export function ProductForm({ initial = {}, onSave, onCancel, loading }: Product
     imageUrl:    initial.imageUrl    ?? null,
     stock:       initial.stock       ?? 0,
     active:      initial.active      ?? true,
+    category:    initial.category    ?? "Varios",
   });
   const [error, setError] = useState<string | null>(null);
 
@@ -100,6 +103,22 @@ export function ProductForm({ initial = {}, onSave, onCancel, loading }: Product
             required
             className={inputClass}
           />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-sm text-white/70">Categoría *</label>
+          <select
+            value={data.category}
+            onChange={(e) => set("category", e.target.value)}
+            required
+            className={`${inputClass} cursor-pointer`}
+          >
+            {PRODUCT_CATEGORIES.map((cat) => (
+              <option key={cat} value={cat} className="bg-neutral-900">
+                {cat}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

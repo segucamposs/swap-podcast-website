@@ -11,6 +11,7 @@ type RawProduct = {
   stock: number;
   active: boolean;
   sizes: string[] | null;
+  category: string;
   created_at: string;
   updated_at: string;
 };
@@ -26,6 +27,7 @@ function toProduct(raw: RawProduct): Product {
     stock: raw.stock,
     active: raw.active,
     sizes: raw.sizes ?? null,
+    category: raw.category ?? "Accesorios",
     createdAt: raw.created_at,
     updatedAt: raw.updated_at,
   } satisfies Product;
