@@ -11,9 +11,10 @@ import { usePathname } from "next/navigation";
 const NAV_LINKS = [
   { href: "/", label: "Inicio", num: "01" },
   { href: "/episodes", label: "Episodios", num: "02" },
-  { href: "/invitados", label: "Invitados", num: "03" },
-  { href: "/about", label: "Nosotros", num: "04" },
-  { href: "/contact", label: "Contacto", num: "05" },
+  // On standby until the page is fully polished — route lives at app/(public)/_invitados
+  // { href: "/invitados", label: "Invitados", num: "03" },
+  { href: "/about", label: "Nosotros", num: "03" },
+  { href: "/contact", label: "Contacto", num: "04" },
 ];
 
 const ALL_LINKS = [

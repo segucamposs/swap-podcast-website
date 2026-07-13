@@ -11,7 +11,8 @@ const PLATFORMS = [
 
 const SITE_LINKS = [
   { href: "/episodes", label: "Episodios" },
-  { href: "/invitados", label: "Invitados" },
+  // On standby until the page is fully polished — route lives at app/(public)/_invitados
+  // { href: "/invitados", label: "Invitados" },
   { href: "/about", label: "Nosotros" },
   { href: "/contact", label: "Contacto" },
 ];
