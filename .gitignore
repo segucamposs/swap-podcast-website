@@ -43,3 +43,4 @@ next-env.d.ts
 
 # Original guest photos (staging) — converted into public/images/guests/*.jpg
 public/images/guests pictures/
+test-results/
