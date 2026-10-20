@@ -61,8 +61,8 @@ export default function StickyHeader() {
           <Image
             src="/logo/swap-logo-transparent.png"
             alt="SWAP Podcast"
-            width={4923}
-            height={1357}
+            width={116}
+            height={32}
             className="h-8 w-auto object-contain"
             priority
           />

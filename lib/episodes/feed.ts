@@ -3,6 +3,7 @@
  * Always up-to-date — unlike the iTunes API which can lag by days.
  * Revalidates every hour. Falls back to static data if unreachable.
  */
+import { cache } from "react";
 import type { Episode } from "./types";
 import { getEpisodes as getFallbackEpisodes } from "./data";
 import { episodeOverrides } from "./overrides";
@@ -105,7 +106,10 @@ async function getEpisodeLinks(): Promise<EpisodeLinks> {
 
 // ─── Public API ──────────────────────────────────────────────────────────────
 
-export async function getAllEpisodes(): Promise<Episode[]> {
+// Memoized per render pass — pages call this alongside getEpisodeCount /
+// getEpisodeBySlug / generateMetadata, and without cache() each call re-parsed
+// the whole feed and re-queried Supabase.
+export const getAllEpisodes = cache(async (): Promise<Episode[]> => {
   try {
     const [rssRes, links] = await Promise.all([
       fetch(RSS_FEED_URL, { next: { revalidate: 3600 } }),
@@ -171,7 +175,7 @@ export async function getAllEpisodes(): Promise<Episode[]> {
     console.error("[feed] RSS feed failed — using static fallback:", err);
     return getFallbackEpisodes();
   }
-}
+});
 
 export async function getLatestEpisode(): Promise<Episode | null> {
   const eps = await getAllEpisodes();

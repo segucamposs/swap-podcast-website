@@ -11,13 +11,12 @@ export default function HeroLogo() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const onScroll = () => {
-      const rect = el.getBoundingClientRect();
-      setIsPast(rect.bottom < 0);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
+    // Past = no longer intersecting AND above the viewport (bottom < 0).
+    const obs = new IntersectionObserver(([entry]) => {
+      setIsPast(!entry.isIntersecting && entry.boundingClientRect.bottom < 0);
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
   }, []);
 
   return (
@@ -32,6 +31,7 @@ export default function HeroLogo() {
           alt="SWAP Podcast"
           width={4923}
           height={1357}
+          sizes="(max-width: 896px) 100vw, 896px"
           priority
           className="w-full h-auto"
         />

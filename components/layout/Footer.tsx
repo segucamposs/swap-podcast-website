@@ -29,8 +29,8 @@ export default function Footer() {
             <Image
               src="/logo/swap-logo-transparent.png"
               alt="SWAP Podcast"
-              width={4923}
-              height={1357}
+              width={145}
+              height={40}
               className="h-10 w-auto mb-4"
             />
             <p className="text-white/40 text-sm leading-relaxed max-w-xs">

@@ -143,7 +143,7 @@ function TimelineStop({ node, topPct }: { node: Node; topPct: number }) {
               src={photo}
               alt={`${ep.guest} en SWAP Podcast`}
               fill
-              sizes="(max-width: 640px) 144px, 208px"
+              sizes="(max-width: 640px) 128px, 224px"
               className="object-cover"
             />
           ) : (

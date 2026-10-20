@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 
 const SPOTIFY_SHOW_ID   = "1t25iC8KdPXDZ9BUr1KgxY";
@@ -140,12 +141,12 @@ export async function GET(req: NextRequest) {
   }
   const supabase = createClient(supabaseUrl, serviceKey);
 
-  // Which slugs do we already have?
-  const { data: existing } = await supabase.from("episode_links").select("slug");
+  // Which slugs do we already have? + all episodes from RSS (always up-to-date)
+  const [{ data: existing }, itunesEps] = await Promise.all([
+    supabase.from("episode_links").select("slug"),
+    getRssEpisodes(),
+  ]);
   const existingSlugs = new Set((existing ?? []).map((r: { slug: string }) => r.slug));
-
-  // Get all episodes from RSS (always up-to-date)
-  const itunesEps = await getRssEpisodes();
   const newEps    = itunesEps.filter((ep) => !existingSlugs.has(ep.slug) && ep.guest);
 
   if (newEps.length === 0) {
@@ -153,34 +154,41 @@ export async function GET(req: NextRequest) {
   }
 
   // Fetch platform data in parallel
-  const ytApiKey     = process.env.YOUTUBE_API_KEY ?? null;
-  const spotifyToken = await getSpotifyToken();
+  // (YouTube no longer waits for the Spotify token round trip)
+  const ytApiKey = process.env.YOUTUBE_API_KEY ?? null;
 
   const [spotifyEps, ytVideos] = await Promise.all([
-    spotifyToken ? getSpotifyEpisodes(spotifyToken) : Promise.resolve([]),
-    ytApiKey     ? getYouTubeVideos(ytApiKey)       : Promise.resolve([]),
+    getSpotifyToken().then((token) => (token ? getSpotifyEpisodes(token) : [])),
+    ytApiKey ? getYouTubeVideos(ytApiKey) : Promise.resolve([]),
   ]);
 
   const spotifyItems = spotifyEps.map((e) => ({ title: e.name, url: e.external_urls.spotify }));
   const ytItems      = ytVideos.map((v: { title: string; videoId: string }) => ({ title: v.title, videoId: v.videoId }));
 
-  const upserted: string[] = [];
+  const ytTitles     = ytItems.map((v: { title: string; videoId: string }) => ({ title: v.title }));
 
-  for (const ep of newEps) {
-    const siIdx  = findByGuest(ep.guest, spotifyItems);
-    const ytIdx  = findByGuest(ep.guest, ytItems.map((v: { title: string; videoId: string }) => ({ title: v.title })));
-
-    const spotifyUrl  = siIdx >= 0  ? spotifyItems[siIdx].url : null;
-    const youtubeUrl  = ytIdx  >= 0 ? `https://www.youtube.com/watch?v=${ytItems[ytIdx].videoId}` : null;
-
-    const { error } = await supabase.from("episode_links").upsert({
+  const rows = newEps.map((ep) => {
+    const siIdx = findByGuest(ep.guest, spotifyItems);
+    const ytIdx = findByGuest(ep.guest, ytTitles);
+    return {
       slug:        ep.slug,
-      spotify_url: spotifyUrl,
-      youtube_url: youtubeUrl,
-    });
+      spotify_url: siIdx >= 0 ? spotifyItems[siIdx].url : null,
+      youtube_url: ytIdx >= 0 ? `https://www.youtube.com/watch?v=${ytItems[ytIdx].videoId}` : null,
+    };
+  });
 
-    if (!error) upserted.push(ep.slug);
+  // One batched upsert instead of a round trip per episode
+  const { error } = await supabase.from("episode_links").upsert(rows);
+  if (error) {
+    console.error("[sync-episode-links] upsert error:", error.message);
+    return NextResponse.json({ error: "Upsert failed" }, { status: 500 });
   }
+  const upserted = rows.map((r) => r.slug);
+
+  // New links should show up now, not after the 1 h ISR window
+  revalidatePath("/");
+  revalidatePath("/episodes");
+  revalidatePath("/episodes/[slug]", "page");
 
   return NextResponse.json({
     message:  "Sync complete",
