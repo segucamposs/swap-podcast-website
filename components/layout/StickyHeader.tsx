@@ -16,6 +16,8 @@ export default function StickyHeader() {
   useEffect(() => {
     // Non-home pages: always visible
     if (!isHome) {
+      // Non-home pages are always visible — sync setState is intentional here.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setVisible(true);
       return;
     }

@@ -177,6 +177,9 @@ export default function Navbar() {
   }, [isOpen]);
 
   useEffect(() => {
+    // Close the overlay whenever the route changes.
+    // Sync setState in a pathname-tracking effect is the correct pattern here.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsOpen(false);
   }, [pathname]);
 
