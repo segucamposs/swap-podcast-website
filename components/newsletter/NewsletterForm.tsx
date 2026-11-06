@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 const DRAFT_KEY = "swap_newsletter_draft";
@@ -178,6 +179,13 @@ export default function NewsletterForm() {
           )}
         </button>
       </div>
+
+      <p className="text-xs text-white/30">
+        Usamos tu nombre y tu email solo para avisarte de episodios nuevos.{" "}
+        <Link href="/privacidad" className="underline hover:text-white/50 transition-colors duration-200">
+          Privacidad
+        </Link>
+      </p>
 
       {status === "error" && (
         <p id="newsletter-error" role="alert" className="text-sm text-red-400">

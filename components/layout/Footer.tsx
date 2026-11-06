@@ -106,6 +106,10 @@ export default function Footer() {
           <Link href="/redes" className="hover:text-white/40 transition-colors duration-200">
             Redes
           </Link>
+          <span className="mx-2">·</span>
+          <Link href="/privacidad" className="hover:text-white/40 transition-colors duration-200">
+            Privacidad
+          </Link>
         </div>
       </div>
     </footer>

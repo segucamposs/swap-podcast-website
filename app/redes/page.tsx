@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -118,7 +119,10 @@ export default function RedesPage() {
 
       {/* Bottom credit */}
       <p className="relative z-10 mt-12 text-xs text-white/20">
-        © {new Date().getFullYear()} SWAP Podcast · Argentina
+        © {new Date().getFullYear()} SWAP Podcast · Argentina ·{" "}
+        <Link href="/privacidad" className="hover:text-white/40 transition-colors duration-200">
+          Privacidad
+        </Link>
       </p>
     </div>
   );
